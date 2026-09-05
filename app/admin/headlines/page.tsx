@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { fetchHeadlines, HEADLINE_CATEGORIES } from "@/lib/headlines";
 import { slugify } from "@/lib/posts";
+import GenerateDraftButton from "@/components/GenerateDraftButton";
 
 export const revalidate = 900;
 
@@ -18,8 +19,9 @@ export default async function HeadlinesPage({
     <div className="max-w-4xl mx-auto px-5 py-10">
       <h1 className="font-display font-900 text-2xl mb-2">Today's Headlines</h1>
       <p className="text-sm text-muted mb-6">
-        Real, current stories — pick one to start a draft. Updates every 15
-        minutes.
+        Real, current stories — start a blank draft, or let AI write a first
+        pass for you to review. Nothing publishes until you approve it.
+        Updates every 15 minutes.
       </p>
 
       <div className="flex flex-wrap gap-2 mb-8 border-b-2 border-ink pb-4">
@@ -51,13 +53,18 @@ export default async function HeadlinesPage({
             <p className="text-xs text-muted mb-2">
               {h.source} &middot; {new Date(h.pubDate).toLocaleString()}
             </p>
-            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wide">
+            <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide">
               <Link
                 href={`/admin/new?title=${encodeURIComponent(h.title)}&category=${activeCategory}&slug=${slugify(h.title)}&source=${encodeURIComponent(h.link)}`}
                 className="text-brand hover:underline"
               >
-                Start draft from this →
+                Blank draft →
               </Link>
+              <GenerateDraftButton
+                title={h.title}
+                link={h.link}
+                category={activeCategory}
+              />
               <a
                 href={h.link}
                 target="_blank"
