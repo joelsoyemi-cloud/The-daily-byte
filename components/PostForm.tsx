@@ -1,24 +1,40 @@
-'use client';
+"use client";
 
-import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { slugify, CATEGORIES, type Post } from '@/lib/posts';
-import { uploadMedia, videoUrlToEmbed, videoFileEmbed } from '@/lib/media';
-import Markdown from './Markdown';
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { slugify, CATEGORIES, type Post } from "@/lib/posts";
+import { uploadMedia, videoUrlToEmbed, videoFileEmbed } from "@/lib/media";
+import Markdown from "./Markdown";
 
-export default function PostForm({ post }: { post?: Post }) {
+export default function PostForm({
+  post,
+  prefill,
+}: {
+  post?: Post;
+  prefill?: {
+    title?: string;
+    category?: string;
+    slug?: string;
+    sourceUrl?: string;
+  };
+}) {
   const router = useRouter();
   const supabase = createClient();
   const isEditing = !!post;
 
-  const [title, setTitle] = useState(post?.title ?? '');
-  const [slug, setSlug] = useState(post?.slug ?? '');
-  const [slugTouched, setSlugTouched] = useState(isEditing);
-  const [category, setCategory] = useState(post?.category ?? CATEGORIES[0]);
-  const [excerpt, setExcerpt] = useState(post?.excerpt ?? '');
-  const [coverImage, setCoverImage] = useState(post?.cover_image ?? '');
-  const [content, setContent] = useState(post?.content ?? '');
+  const [title, setTitle] = useState(post?.title ?? prefill?.title ?? "");
+  const [slug, setSlug] = useState(post?.slug ?? prefill?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(isEditing || !!prefill);
+  const [category, setCategory] = useState(
+    post?.category ?? prefill?.category ?? CATEGORIES[0],
+  );
+  const [excerpt, setExcerpt] = useState(post?.excerpt ?? "");
+  const [coverImage, setCoverImage] = useState(post?.cover_image ?? "");
+  const [content, setContent] = useState(
+    post?.content ??
+      (prefill?.sourceUrl ? `<!-- source: ${prefill.sourceUrl} -->\n\n` : ""),
+  );
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,15 +56,15 @@ export default function PostForm({ post }: { post?: Post }) {
   function insertIntoContent(snippet: string) {
     const el = contentRef.current;
     if (!el) {
-      setContent((c) => c + (c ? '\n\n' : '') + snippet + '\n');
+      setContent((c) => c + (c ? "\n\n" : "") + snippet + "\n");
       return;
     }
     const start = el.selectionStart ?? content.length;
     const end = el.selectionEnd ?? content.length;
     const before = content.slice(0, start);
     const after = content.slice(end);
-    const needsLeadingBreak = before && !before.endsWith('\n\n');
-    const insert = (needsLeadingBreak ? '\n\n' : '') + snippet + '\n\n';
+    const needsLeadingBreak = before && !before.endsWith("\n\n");
+    const insert = (needsLeadingBreak ? "\n\n" : "") + snippet + "\n\n";
     const next = before + insert + after;
     setContent(next);
     requestAnimationFrame(() => {
@@ -67,10 +83,10 @@ export default function PostForm({ post }: { post?: Post }) {
       const url = await uploadMedia(file);
       setCoverImage(url);
     } catch (err: any) {
-      setError(err.message ?? 'Cover image upload failed.');
+      setError(err.message ?? "Cover image upload failed.");
     } finally {
       setUploadingCover(false);
-      e.target.value = '';
+      e.target.value = "";
     }
   }
 
@@ -82,13 +98,13 @@ export default function PostForm({ post }: { post?: Post }) {
     try {
       for (const file of files) {
         const url = await uploadMedia(file);
-        insertIntoContent(`![${file.name.replace(/\.[^.]+$/, '')}](${url})`);
+        insertIntoContent(`![${file.name.replace(/\.[^.]+$/, "")}](${url})`);
       }
     } catch (err: any) {
-      setError(err.message ?? 'Image upload failed.');
+      setError(err.message ?? "Image upload failed.");
     } finally {
       setUploadingImage(false);
-      e.target.value = '';
+      e.target.value = "";
     }
   }
 
@@ -101,15 +117,15 @@ export default function PostForm({ post }: { post?: Post }) {
       const url = await uploadMedia(file);
       insertIntoContent(videoFileEmbed(url));
     } catch (err: any) {
-      setError(err.message ?? 'Video upload failed.');
+      setError(err.message ?? "Video upload failed.");
     } finally {
       setUploadingVideo(false);
-      e.target.value = '';
+      e.target.value = "";
     }
   }
 
   function handleVideoUrl() {
-    const url = window.prompt('Paste a YouTube or Vimeo link:');
+    const url = window.prompt("Paste a YouTube or Vimeo link:");
     if (!url) return;
     const embed = videoUrlToEmbed(url);
     if (!embed) {
@@ -133,12 +149,12 @@ export default function PostForm({ post }: { post?: Post }) {
       published: publish,
       published_at: publish
         ? (post?.published_at ?? new Date().toISOString())
-        : post?.published_at ?? null,
+        : (post?.published_at ?? null),
     };
 
     const { error } = isEditing
-      ? await supabase.from('posts').update(payload).eq('id', post!.id)
-      : await supabase.from('posts').insert(payload);
+      ? await supabase.from("posts").update(payload).eq("id", post!.id)
+      : await supabase.from("posts").insert(payload);
 
     setSaving(false);
 
@@ -147,7 +163,7 @@ export default function PostForm({ post }: { post?: Post }) {
       return;
     }
 
-    router.push('/admin');
+    router.push("/admin");
     router.refresh();
   }
 
@@ -155,14 +171,14 @@ export default function PostForm({ post }: { post?: Post }) {
     <div className="max-w-4xl mx-auto px-5 py-10">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-display font-900 text-2xl">
-          {isEditing ? 'Edit post' : 'New post'}
+          {isEditing ? "Edit post" : "New post"}
         </h1>
         <button
           type="button"
           onClick={() => setShowPreview((s) => !s)}
           className="text-xs font-bold uppercase tracking-wide text-muted hover:text-brand"
         >
-          {showPreview ? 'Edit' : 'Preview'}
+          {showPreview ? "Edit" : "Preview"}
         </button>
       </div>
 
@@ -172,9 +188,9 @@ export default function PostForm({ post }: { post?: Post }) {
             {category}
           </span>
           <h1 className="font-display font-900 text-3xl leading-tight mb-6">
-            {title || 'Untitled'}
+            {title || "Untitled"}
           </h1>
-          <Markdown content={content || '*Nothing to preview yet.*'} />
+          <Markdown content={content || "*Nothing to preview yet.*"} />
         </div>
       ) : (
         <div className="space-y-5">
@@ -262,7 +278,7 @@ export default function PostForm({ post }: { post?: Post }) {
                 disabled={uploadingCover}
                 className="border-2 border-line px-3 py-2 text-xs font-bold uppercase tracking-wide hover:border-ink disabled:opacity-50 shrink-0"
               >
-                {uploadingCover ? 'Uploading…' : 'Upload'}
+                {uploadingCover ? "Uploading…" : "Upload"}
               </button>
             </div>
             {coverImage && (
@@ -274,7 +290,8 @@ export default function PostForm({ post }: { post?: Post }) {
               />
             )}
             <p className="text-xs text-muted mt-1">
-              Images are automatically compressed before upload to keep the site fast.
+              Images are automatically compressed before upload to keep the site
+              fast.
             </p>
           </div>
 
@@ -298,10 +315,14 @@ export default function PostForm({ post }: { post?: Post }) {
                   disabled={uploadingImage}
                   className="text-accent hover:underline disabled:opacity-50"
                 >
-                  {uploadingImage ? 'Uploading…' : '+ Image(s)'}
+                  {uploadingImage ? "Uploading…" : "+ Image(s)"}
                 </button>
 
-                <button type="button" onClick={handleVideoUrl} className="text-gold hover:underline">
+                <button
+                  type="button"
+                  onClick={handleVideoUrl}
+                  className="text-gold hover:underline"
+                >
                   + Video URL
                 </button>
 
@@ -318,7 +339,7 @@ export default function PostForm({ post }: { post?: Post }) {
                   disabled={uploadingVideo}
                   className="text-gold hover:underline disabled:opacity-50"
                 >
-                  {uploadingVideo ? 'Uploading…' : '+ Video file'}
+                  {uploadingVideo ? "Uploading…" : "+ Video file"}
                 </button>
               </div>
             </div>
@@ -328,11 +349,14 @@ export default function PostForm({ post }: { post?: Post }) {
               onChange={(e) => setContent(e.target.value)}
               rows={20}
               className="w-full border-2 border-line focus:border-ink px-3 py-3 bg-white text-sm font-mono leading-relaxed"
-              placeholder={'## Intro\n\nWrite in Markdown. Use the buttons above to drop in images or video anywhere in the text.'}
+              placeholder={
+                "## Intro\n\nWrite in Markdown. Use the buttons above to drop in images or video anywhere in the text."
+              }
             />
             <p className="text-xs text-muted mt-1">
-              Uploaded images/videos are inserted at your cursor — you can cut and
-              paste them anywhere in the text afterward. Add as many as you like.
+              Uploaded images/videos are inserted at your cursor — you can cut
+              and paste them anywhere in the text afterward. Add as many as you
+              like.
             </p>
           </div>
         </div>
@@ -346,7 +370,7 @@ export default function PostForm({ post }: { post?: Post }) {
           disabled={saving || !title || !content}
           className="bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-40"
         >
-          {saving ? 'Saving…' : post?.published ? 'Save' : 'Publish'}
+          {saving ? "Saving…" : post?.published ? "Save" : "Publish"}
         </button>
         <button
           onClick={() => save(false)}

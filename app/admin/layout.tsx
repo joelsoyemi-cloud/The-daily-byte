@@ -1,11 +1,18 @@
-import Link from 'next/link';
-import SignOutButton from './SignOutButton';
+import Link from "next/link";
+import SignOutButton from "./SignOutButton";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen bg-surface">
       <div className="border-b-2 border-ink bg-white">
         <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
+          <Link href="/admin/headlines" className="hover:text-brand">
+            Headlines
+          </Link>
           <Link href="/admin" className="font-display font-900 text-lg">
             Admin
           </Link>
