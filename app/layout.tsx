@@ -3,8 +3,18 @@ import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'The Daily Byte',
-  description: 'News, tech, and entertainment — updated daily.',
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://the-dailybyte-nine.vercel.app",
+  ),
+  title: {
+    default: "The Daily Byte — News, Tech & Entertainment",
+    template: "%s | The Daily Byte",
+  },
+  description: "News, tech, and entertainment — updated daily.",
+  openGraph: {
+    siteName: "The Daily Byte",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
