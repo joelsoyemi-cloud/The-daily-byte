@@ -10,17 +10,27 @@ export type Post = {
   created_at: string;
   updated_at: string;
   published_at: string | null;
+  author_id: string | null;
+  category_id: string | null;
+  status: string;
+  content_type: string;
+  featured: boolean;
+  breaking: boolean;
+  scheduled_at: string | null;
+  tags: string[];
+  seo_title: string | null;
+  seo_description: string | null;
 };
 
 export const CATEGORIES = [
-  'General',
-  'Entertainment',
-  'Music',
-  'Tech',
-  'Business',
-  'Lifestyle',
-  'Sports',
-  'Politics',
+  "General",
+  "Entertainment",
+  "Music",
+  "Tech",
+  "Business",
+  "Lifestyle",
+  "Sports",
+  "Politics",
 ];
 
 export function slugify(input: string): string {

@@ -1,67 +1,51 @@
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { formatDate, type Post } from '@/lib/posts';
-import DeletePostButton from './DeletePostButton';
+import { requireAdmin } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 0;
 
-export default async function AdminDashboard() {
+export default async function AdminOverview() {
+  const profile = await requireAdmin();
   const supabase = await createClient();
-  const { data: posts } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false });
 
-  const list = (posts ?? []) as Post[];
+  const { count: userCount } = await supabase
+    .from("profiles")
+    .select("id", { count: "exact", head: true });
+
+  const { count: publishedCount } = await supabase
+    .from("posts")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "published");
+
+  const { count: pendingCount } = await supabase
+    .from("posts")
+    .select("id", { count: "exact", head: true })
+    .in("status", ["submitted", "under_review"]);
 
   return (
-    <div className="max-w-4xl mx-auto px-5 py-10">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display font-900 text-2xl">Posts</h1>
-        <Link
-          href="/admin/new"
-          className="bg-ink text-white px-4 py-2 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors"
-        >
-          + New post
-        </Link>
+    <div className="max-w-3xl mx-auto px-5 py-10">
+      <h1 className="font-display font-900 text-2xl mb-2">Admin Overview</h1>
+      <p className="text-muted text-sm mb-8">
+        Signed in as {profile.display_name}
+      </p>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="border-2 border-line px-4 py-4 bg-white">
+          <p className="text-2xl font-display font-900">{userCount ?? 0}</p>
+          <p className="text-xs text-muted font-medium mt-1">Total Users</p>
+        </div>
+        <div className="border-2 border-line px-4 py-4 bg-white">
+          <p className="text-2xl font-display font-900">
+            {publishedCount ?? 0}
+          </p>
+          <p className="text-xs text-muted font-medium mt-1">
+            Published Articles
+          </p>
+        </div>
+        <div className="border-2 border-line px-4 py-4 bg-white">
+          <p className="text-2xl font-display font-900">{pendingCount ?? 0}</p>
+          <p className="text-xs text-muted font-medium mt-1">Awaiting Review</p>
+        </div>
       </div>
-
-      {list.length === 0 && (
-        <p className="text-muted text-sm">
-          No posts yet. Click "New post" to write your first one.
-        </p>
-      )}
-
-      <ul className="divide-y divide-line border-t-2 border-ink">
-        {list.map((post) => (
-          <li key={post.id} className="py-4 flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-semibold truncate">{post.title}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wide bg-surface px-1.5 py-0.5 text-muted">
-                  {post.category}
-                </span>
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 shrink-0 ${
-                    post.published ? 'bg-brand/10 text-brand' : 'bg-gold/10 text-gold'
-                  }`}
-                >
-                  {post.published ? 'Published' : 'Draft'}
-                </span>
-              </div>
-              <p className="text-xs text-muted mt-1">
-                {formatDate(post.updated_at)} &middot; /blog/{post.slug}
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wide shrink-0">
-              <Link href={`/admin/edit/${post.id}`} className="text-muted hover:text-brand">
-                Edit
-              </Link>
-              <DeletePostButton postId={post.id} postTitle={post.title} />
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

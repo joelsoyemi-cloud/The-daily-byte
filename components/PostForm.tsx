@@ -1,42 +1,81 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { slugify, CATEGORIES, type Post } from "@/lib/posts";
+import { slugify } from "@/lib/posts";
 import { uploadMedia, videoUrlToEmbed, videoFileEmbed } from "@/lib/media";
 import Markdown from "./Markdown";
 
-export default function PostForm({
-  post,
-  prefill,
-}: {
-  post?: Post;
-  prefill?: {
-    title?: string;
-    category?: string;
-    slug?: string;
-    sourceUrl?: string;
-  };
-}) {
-  const router = useRouter();
-  const supabase = createClient();
-  const isEditing = !!post;
+export type ArticleValues = {
+  title: string;
+  slug: string;
+  category_id: string;
+  content_type: string;
+  excerpt: string;
+  cover_image: string;
+  content: string;
+  tags: string[];
+  seo_title: string;
+  seo_description: string;
+  featured: boolean;
+  breaking: boolean;
+};
 
-  const [title, setTitle] = useState(post?.title ?? prefill?.title ?? "");
-  const [slug, setSlug] = useState(post?.slug ?? prefill?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(isEditing || !!prefill);
-  const [category, setCategory] = useState(
-    post?.category ?? prefill?.category ?? CATEGORIES[0],
+export type ArticleAction = {
+  label: string;
+  variant: "primary" | "secondary" | "danger";
+  onClick: (values: ArticleValues) => Promise<void>;
+};
+
+const CONTENT_TYPES = [
+  "news",
+  "feature",
+  "opinion",
+  "editorial",
+  "interview",
+  "press_release",
+  "sponsored",
+  "review",
+  "video",
+];
+
+export default function PostForm({
+  initialValues,
+  categories,
+  actions,
+  reviewerNote,
+  allowEditorialFields = false,
+}: {
+  initialValues?: Partial<ArticleValues>;
+  categories: { id: string; name: string }[];
+  actions: ArticleAction[];
+  reviewerNote?: string | null;
+  allowEditorialFields?: boolean;
+}) {
+  const [title, setTitle] = useState(initialValues?.title ?? "");
+  const [slug, setSlug] = useState(initialValues?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(!!initialValues?.slug);
+  const [categoryId, setCategoryId] = useState(
+    initialValues?.category_id ?? categories[0]?.id ?? "",
   );
-  const [excerpt, setExcerpt] = useState(post?.excerpt ?? "");
-  const [coverImage, setCoverImage] = useState(post?.cover_image ?? "");
-  const [content, setContent] = useState(
-    post?.content ??
-      (prefill?.sourceUrl ? `<!-- source: ${prefill.sourceUrl} -->\n\n` : ""),
+  const [contentType, setContentType] = useState(
+    initialValues?.content_type ?? "news",
   );
+  const [excerpt, setExcerpt] = useState(initialValues?.excerpt ?? "");
+  const [coverImage, setCoverImage] = useState(
+    initialValues?.cover_image ?? "",
+  );
+  const [content, setContent] = useState(initialValues?.content ?? "");
+  const [tagsInput, setTagsInput] = useState(
+    (initialValues?.tags ?? []).join(", "),
+  );
+  const [seoTitle, setSeoTitle] = useState(initialValues?.seo_title ?? "");
+  const [seoDescription, setSeoDescription] = useState(
+    initialValues?.seo_description ?? "",
+  );
+  const [featured, setFeatured] = useState(initialValues?.featured ?? false);
+  const [breaking, setBreaking] = useState(initialValues?.breaking ?? false);
   const [showPreview, setShowPreview] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [runningAction, setRunningAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -53,16 +92,34 @@ export default function PostForm({
     if (!slugTouched) setSlug(slugify(value));
   }
 
-  function insertIntoContent(snippet: string) {
+  function insertAtCursor(before: string, after: string = "") {
+    const el = contentRef.current;
+    if (!el) {
+      setContent((c) => c + before + after);
+      return;
+    }
+    const start = el.selectionStart ?? content.length;
+    const end = el.selectionEnd ?? content.length;
+    const selected = content.slice(start, end);
+    const next =
+      content.slice(0, start) + before + selected + after + content.slice(end);
+    setContent(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + before.length + selected.length + after.length;
+      el.setSelectionRange(pos, pos);
+    });
+  }
+
+  function insertBlock(snippet: string) {
     const el = contentRef.current;
     if (!el) {
       setContent((c) => c + (c ? "\n\n" : "") + snippet + "\n");
       return;
     }
     const start = el.selectionStart ?? content.length;
-    const end = el.selectionEnd ?? content.length;
     const before = content.slice(0, start);
-    const after = content.slice(end);
+    const after = content.slice(el.selectionEnd ?? start);
     const needsLeadingBreak = before && !before.endsWith("\n\n");
     const insert = (needsLeadingBreak ? "\n\n" : "") + snippet + "\n\n";
     const next = before + insert + after;
@@ -80,8 +137,7 @@ export default function PostForm({
     setUploadingCover(true);
     setError(null);
     try {
-      const url = await uploadMedia(file);
-      setCoverImage(url);
+      setCoverImage(await uploadMedia(file));
     } catch (err: any) {
       setError(err.message ?? "Cover image upload failed.");
     } finally {
@@ -98,7 +154,7 @@ export default function PostForm({
     try {
       for (const file of files) {
         const url = await uploadMedia(file);
-        insertIntoContent(`![${file.name.replace(/\.[^.]+$/, "")}](${url})`);
+        insertBlock(`![${file.name.replace(/\.[^.]+$/, "")}](${url})`);
       }
     } catch (err: any) {
       setError(err.message ?? "Image upload failed.");
@@ -115,7 +171,7 @@ export default function PostForm({
     setError(null);
     try {
       const url = await uploadMedia(file);
-      insertIntoContent(videoFileEmbed(url));
+      insertBlock(videoFileEmbed(url));
     } catch (err: any) {
       setError(err.message ?? "Video upload failed.");
     } finally {
@@ -132,47 +188,55 @@ export default function PostForm({
       setError("That link doesn't look like a YouTube or Vimeo URL.");
       return;
     }
-    insertIntoContent(embed);
+    insertBlock(embed);
   }
 
-  async function save(publish: boolean) {
-    setSaving(true);
+  async function runAction(action: ArticleAction) {
+    setRunningAction(action.label);
     setError(null);
-
-    const payload = {
-      title,
-      slug: slug || slugify(title),
-      category,
-      excerpt: excerpt || null,
-      cover_image: coverImage || null,
-      content,
-      published: publish,
-      published_at: publish
-        ? (post?.published_at ?? new Date().toISOString())
-        : (post?.published_at ?? null),
-    };
-
-    const { error } = isEditing
-      ? await supabase.from("posts").update(payload).eq("id", post!.id)
-      : await supabase.from("posts").insert(payload);
-
-    setSaving(false);
-
-    if (error) {
-      setError(error.message);
-      return;
+    try {
+      await action.onClick({
+        title,
+        slug: slug || slugify(title),
+        category_id: categoryId,
+        content_type: contentType,
+        excerpt,
+        cover_image: coverImage,
+        content,
+        tags: tagsInput
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
+        seo_title: seoTitle,
+        seo_description: seoDescription,
+        featured,
+        breaking,
+      });
+    } catch (err: any) {
+      setError(err.message ?? "Something went wrong.");
+    } finally {
+      setRunningAction(null);
     }
-
-    router.push("/admin");
-    router.refresh();
   }
+
+  const canSubmit = !!title && !!content;
+
+  const toolbarBtn = (label: string, onClick: () => void, title?: string) => (
+    <button
+      key={label}
+      type="button"
+      onClick={onClick}
+      title={title}
+      className="px-2.5 py-1.5 text-sm font-bold border-r border-line last:border-r-0 hover:bg-surface"
+    >
+      {label}
+    </button>
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-5 py-10">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display font-900 text-2xl">
-          {isEditing ? "Edit post" : "New post"}
-        </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display font-900 text-2xl">Article</h1>
         <button
           type="button"
           onClick={() => setShowPreview((s) => !s)}
@@ -182,11 +246,17 @@ export default function PostForm({
         </button>
       </div>
 
+      {reviewerNote && (
+        <div className="border-2 border-gold bg-gold/10 px-4 py-3 mb-6 text-sm">
+          <p className="font-bold uppercase text-xs tracking-wide text-gold mb-1">
+            Changes requested
+          </p>
+          <p>{reviewerNote}</p>
+        </div>
+      )}
+
       {showPreview ? (
         <div className="border-2 border-line bg-white px-6 py-8">
-          <span className="inline-block bg-brand text-white text-[11px] font-bold uppercase tracking-wide px-2 py-1 mb-3">
-            {category}
-          </span>
           <h1 className="font-display font-900 text-3xl leading-tight mb-6">
             {title || "Untitled"}
           </h1>
@@ -196,29 +266,45 @@ export default function PostForm({
         <div className="space-y-5">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
-              Title
+              Headline
             </label>
             <input
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-lg font-semibold"
-              placeholder="Big Brother finale sparks online reactions"
             />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-5">
+          <div className="grid sm:grid-cols-3 gap-5">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
                 Category
               </label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
                 className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+                Content type
+              </label>
+              <select
+                value={contentType}
+                onChange={(e) => setContentType(e.target.value)}
+                className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm capitalize"
+              >
+                {CONTENT_TYPES.map((c) => (
+                  <option key={c} value={c} className="capitalize">
+                    {c.replace("_", " ")}
                   </option>
                 ))}
               </select>
@@ -244,7 +330,7 @@ export default function PostForm({
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
-              Excerpt (shown on the front page)
+              Excerpt / deck
             </label>
             <textarea
               value={excerpt}
@@ -289,18 +375,67 @@ export default function PostForm({
                 className="mt-2 h-24 w-auto rounded border border-line object-cover"
               />
             )}
-            <p className="text-xs text-muted mt-1">
-              Images are automatically compressed before upload to keep the site
-              fast.
-            </p>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wide text-muted">
-                Content (Markdown)
+            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+              Tags{" "}
+              <span className="text-muted normal-case font-normal">
+                (comma-separated)
+              </span>
+            </label>
+            <input
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
+              placeholder="e.g. elections, lagos, economy"
+              className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            />
+          </div>
+
+          {allowEditorialFields && (
+            <div className="flex gap-6 border-2 border-gold bg-gold/5 px-4 py-3">
+              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={featured}
+                  onChange={(e) => setFeatured(e.target.checked)}
+                />
+                Featured
               </label>
-              <div className="flex gap-3 text-xs font-bold uppercase tracking-wide">
+              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={breaking}
+                  onChange={(e) => setBreaking(e.target.checked)}
+                />
+                Breaking news
+              </label>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+              Article body
+            </label>
+            <div className="border-2 border-line border-b-0 bg-surface flex flex-wrap items-center">
+              {toolbarBtn("B", () => insertAtCursor("**", "**"), "Bold")}
+              {toolbarBtn("i", () => insertAtCursor("*", "*"), "Italic")}
+              {toolbarBtn("H2", () => insertBlock("## Heading"), "Heading")}
+              {toolbarBtn("❝", () => insertBlock("> Quote"), "Quote")}
+              {toolbarBtn(
+                "• List",
+                () => insertBlock("- Item one\n- Item two"),
+                "Bulleted list",
+              )}
+              {toolbarBtn(
+                "Link",
+                () => {
+                  const url = window.prompt("Link URL:");
+                  if (url) insertAtCursor("[", `](${url})`);
+                },
+                "Link",
+              )}
+              <div className="ml-auto flex text-xs font-bold uppercase tracking-wide">
                 <input
                   ref={imageInputRef}
                   type="file"
@@ -313,19 +448,17 @@ export default function PostForm({
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
                   disabled={uploadingImage}
-                  className="text-accent hover:underline disabled:opacity-50"
+                  className="px-2.5 py-1.5 text-accent hover:underline disabled:opacity-50"
                 >
                   {uploadingImage ? "Uploading…" : "+ Image(s)"}
                 </button>
-
                 <button
                   type="button"
                   onClick={handleVideoUrl}
-                  className="text-gold hover:underline"
+                  className="px-2.5 py-1.5 text-gold hover:underline"
                 >
                   + Video URL
                 </button>
-
                 <input
                   ref={videoInputRef}
                   type="file"
@@ -337,7 +470,7 @@ export default function PostForm({
                   type="button"
                   onClick={() => videoInputRef.current?.click()}
                   disabled={uploadingVideo}
-                  className="text-gold hover:underline disabled:opacity-50"
+                  className="px-2.5 py-1.5 text-gold hover:underline disabled:opacity-50"
                 >
                   {uploadingVideo ? "Uploading…" : "+ Video file"}
                 </button>
@@ -349,36 +482,66 @@ export default function PostForm({
               onChange={(e) => setContent(e.target.value)}
               rows={20}
               className="w-full border-2 border-line focus:border-ink px-3 py-3 bg-white text-sm font-mono leading-relaxed"
-              placeholder={
-                "## Intro\n\nWrite in Markdown. Use the buttons above to drop in images or video anywhere in the text."
-              }
+              placeholder="Use the buttons above — you don't need to know any formatting syntax."
             />
             <p className="text-xs text-muted mt-1">
-              Uploaded images/videos are inserted at your cursor — you can cut
-              and paste them anywhere in the text afterward. Add as many as you
-              like.
+              The buttons above handle formatting for you. Click Preview anytime
+              to see exactly how readers will see it.
             </p>
           </div>
+
+          <details className="border-2 border-line bg-white px-4 py-3">
+            <summary className="text-xs font-bold uppercase tracking-wide text-muted cursor-pointer">
+              SEO (optional)
+            </summary>
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+                  SEO title
+                </label>
+                <input
+                  value={seoTitle}
+                  onChange={(e) => setSeoTitle(e.target.value)}
+                  placeholder="Defaults to the headline if left blank"
+                  className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+                  SEO description
+                </label>
+                <textarea
+                  value={seoDescription}
+                  onChange={(e) => setSeoDescription(e.target.value)}
+                  rows={2}
+                  placeholder="Defaults to the excerpt if left blank"
+                  className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+                />
+              </div>
+            </div>
+          </details>
         </div>
       )}
 
       {error && <p className="text-brand text-sm font-medium mt-4">{error}</p>}
 
-      <div className="flex items-center gap-3 mt-8">
-        <button
-          onClick={() => save(true)}
-          disabled={saving || !title || !content}
-          className="bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-40"
-        >
-          {saving ? "Saving…" : post?.published ? "Save" : "Publish"}
-        </button>
-        <button
-          onClick={() => save(false)}
-          disabled={saving || !title || !content}
-          className="border-2 border-line px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:border-ink transition-colors disabled:opacity-40"
-        >
-          Save as draft
-        </button>
+      <div className="flex items-center gap-3 mt-8 flex-wrap">
+        {actions.map((action) => (
+          <button
+            key={action.label}
+            onClick={() => runAction(action)}
+            disabled={!!runningAction || !canSubmit}
+            className={
+              action.variant === "primary"
+                ? "bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-40"
+                : action.variant === "danger"
+                  ? "border-2 border-brand text-brand px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand hover:text-white transition-colors disabled:opacity-40"
+                  : "border-2 border-line px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:border-ink transition-colors disabled:opacity-40"
+            }
+          >
+            {runningAction === action.label ? "Working…" : action.label}
+          </button>
+        ))}
       </div>
     </div>
   );

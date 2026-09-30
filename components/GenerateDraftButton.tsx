@@ -27,7 +27,7 @@ export default function GenerateDraftButton({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to generate draft.");
-      router.push(`/admin/edit/${data.id}`);
+      router.push(`/dashboard/articles/${data.id}/edit`);
     } catch (err: any) {
       setError(err.message ?? "Something went wrong.");
       setLoading(false);

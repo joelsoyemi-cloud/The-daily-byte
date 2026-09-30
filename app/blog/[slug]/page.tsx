@@ -13,7 +13,7 @@ async function getPost(slug: string): Promise<Post | null> {
     .from("posts")
     .select("*")
     .eq("slug", slug)
-    .eq("published", true)
+    .or(`status.eq.published,and(status.eq.scheduled,scheduled_at.lte.${new Date().toISOString()})`)
     .single();
   return (data as Post) ?? null;
 }
@@ -27,19 +27,19 @@ export async function generateMetadata({
   const post = await getPost(slug);
   if (!post) return {};
   return {
-    title: post.title,
-    description: post.excerpt ?? undefined,
+    title: post.seo_title || post.title,
+    description: post.seo_description || post.excerpt || undefined,
     openGraph: {
-      title: post.title,
-      description: post.excerpt ?? undefined,
+      title: post.seo_title || post.title,
+      description: post.seo_description || post.excerpt || undefined,
       type: "article",
       publishedTime: post.published_at ?? undefined,
       images: post.cover_image ? [post.cover_image] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt ?? undefined,
+      title: post.seo_title || post.title,
+      description: post.seo_description || post.excerpt || undefined,
       images: post.cover_image ? [post.cover_image] : undefined,
     },
   };
@@ -80,7 +80,11 @@ export default async function BlogPostPage({
     <article className="max-w-3xl mx-auto px-5 py-12">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          // Contributor-written text ends up here, and JSON.stringify doesn't escape
+          // "</script>". Escaping "<" stops a hostile headline breaking out of the tag.
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
 
       <Link

@@ -1,30 +1,30 @@
-import Link from "next/link";
-import SignOutButton from "./SignOutButton";
+import { requireAdmin } from "@/lib/auth";
+import DashboardShell, {
+  type NavItem,
+} from "@/components/dashboard/DashboardShell";
 
-export default function AdminLayout({
+const NAV: NavItem[] = [
+  { href: "/admin", label: "Overview" },
+  { href: "/editor/submissions", label: "Submission Queue" },
+  { href: "/editor/articles", label: "Articles" },
+  { href: "/editor/categories", label: "Categories" },
+  { href: "/editor/media", label: "Media" },
+  { href: "/editor/activity", label: "Review Activity" },
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/roles", label: "Roles" },
+  { href: "/admin/settings", label: "Platform Settings" },
+  { href: "/admin/advertising", label: "Advertising" },
+];
+
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const profile = await requireAdmin();
   return (
-    <div className="min-h-screen bg-surface">
-      <div className="border-b-2 border-ink bg-white">
-        <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
-          <Link href="/admin/headlines" className="hover:text-brand">
-            Headlines
-          </Link>
-          <Link href="/admin" className="font-display font-900 text-lg">
-            Admin
-          </Link>
-          <div className="flex items-center gap-5 text-sm font-medium text-muted">
-            <Link href="/" className="hover:text-brand">
-              View site
-            </Link>
-            <SignOutButton />
-          </div>
-        </div>
-      </div>
+    <DashboardShell profile={profile} areaLabel="Admin" nav={NAV}>
       {children}
-    </div>
+    </DashboardShell>
   );
 }

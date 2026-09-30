@@ -39,6 +39,12 @@ export async function POST(request: Request) {
     const finalTitle = draft.title || title;
     const slug = slugify(finalTitle);
 
+    const { data: categoryRow } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", slugify(category || "General"))
+      .single();
+
     const [coverImage, videoUrl] = await Promise.all([
       searchCoverImage(finalTitle),
       searchRelatedVideo(finalTitle),
@@ -57,9 +63,10 @@ export async function POST(request: Request) {
         slug,
         excerpt: draft.excerpt || null,
         content,
-        category: category || "General",
+        author_id: user.id,
+        category_id: categoryRow?.id ?? null,
         cover_image: coverImage,
-        published: false,
+        status: "draft",
       })
       .select("id")
       .single();

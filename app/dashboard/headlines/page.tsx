@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { fetchHeadlines, HEADLINE_CATEGORIES } from "@/lib/headlines";
-import { slugify } from "@/lib/posts";
 import GenerateDraftButton from "@/components/GenerateDraftButton";
 
 export const revalidate = 900;
@@ -20,7 +19,7 @@ export default async function HeadlinesPage({
       <h1 className="font-display font-900 text-2xl mb-2">Today's Headlines</h1>
       <p className="text-sm text-muted mb-6">
         Real, current stories — start a blank draft, or let AI write a first
-        pass for you to review. Nothing publishes until you approve it.
+        pass for you to review. Nothing publishes until an editor approves it.
         Updates every 15 minutes.
       </p>
 
@@ -28,7 +27,7 @@ export default async function HeadlinesPage({
         {HEADLINE_CATEGORIES.map((cat) => (
           <Link
             key={cat}
-            href={`/admin/headlines?category=${cat}`}
+            href={`/dashboard/headlines?category=${cat}`}
             className={`text-xs font-bold uppercase tracking-wide px-3 py-1.5 ${
               cat === activeCategory
                 ? "bg-ink text-white"
@@ -42,7 +41,7 @@ export default async function HeadlinesPage({
 
       {headlines.length === 0 && (
         <p className="text-muted text-sm">
-          Couldn't load headlines right now — try refreshing in a moment.
+          Couldn't load headlines right now — try refreshing.
         </p>
       )}
 
@@ -54,12 +53,6 @@ export default async function HeadlinesPage({
               {h.source} &middot; {new Date(h.pubDate).toLocaleString()}
             </p>
             <div className="flex flex-wrap items-center gap-4 text-xs font-bold uppercase tracking-wide">
-              <Link
-                href={`/admin/new?title=${encodeURIComponent(h.title)}&category=${activeCategory}&slug=${slugify(h.title)}&source=${encodeURIComponent(h.link)}`}
-                className="text-brand hover:underline"
-              >
-                Blank draft →
-              </Link>
               <GenerateDraftButton
                 title={h.title}
                 link={h.link}
