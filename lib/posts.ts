@@ -22,6 +22,25 @@ export type Post = {
   seo_description: string | null;
 };
 
+/** Projection used by the public article page, including nullable joins. */
+export type ArticlePost = Pick<
+  Post,
+  | "id" | "title" | "slug" | "excerpt" | "content" | "category"
+  | "cover_image" | "published_at" | "updated_at" | "author_id"
+  | "category_id" | "seo_title" | "seo_description"
+> & {
+  tags: string[] | null;
+  categories: { name: string; slug: string } | null;
+  profiles: {
+    id: string;
+    username: string | null;
+    display_name: string;
+    bio: string | null;
+    avatar_url: string | null;
+    role: string;
+  } | null;
+};
+
 export const CATEGORIES = [
   "General",
   "Entertainment",
