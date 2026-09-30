@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence } from 'motion/react';
 import { createClient } from '@/lib/supabase/client';
 import { softSpring } from '@/components/motion/Reveal';
+import SearchOverlay from '@/components/site/SearchOverlay';
 
 type NavCategory = { name: string; slug: string };
 
@@ -214,20 +215,9 @@ export default function Header({
         )}
       </AnimatePresence>
 
-      {searchOpen && <SearchOverlayPlaceholder onClose={() => setSearchOpen(false)} />}
+      <AnimatePresence>
+        {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
+      </AnimatePresence>
     </>
-  );
-}
-
-function SearchOverlayPlaceholder({ onClose }: { onClose: () => void }) {
-  return (
-    <div
-      className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm flex items-start justify-center pt-24"
-      onClick={onClose}
-    >
-      <div className="bg-white rounded-3xl p-6 w-full max-w-lg mx-4 shadow-soft-lg" onClick={(e) => e.stopPropagation()}>
-        <p className="text-sm text-muted">Search coming later this phase.</p>
-      </div>
-    </div>
   );
 }
