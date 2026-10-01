@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import BrandLogo from '@/components/brand/BrandLogo';
 import SignOutButton from '@/components/SignOutButton';
 import type { Profile } from '@/lib/auth';
 
@@ -19,7 +20,7 @@ export default function DashboardShell({
     <div className="min-h-screen bg-surface flex">
       <aside className="w-56 shrink-0 bg-white border-r-2 border-ink hidden sm:flex flex-col">
         <div className="px-5 py-5 border-b border-line">
-          <p className="font-display font-900 text-sm">The Daily Byte</p>
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-md"><BrandLogo className="text-sm" /></Link>
           <p className="text-[11px] font-bold uppercase tracking-wide text-brand mt-1">
             {areaLabel}
           </p>

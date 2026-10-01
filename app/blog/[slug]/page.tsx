@@ -148,7 +148,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     author: author?.display_name ? { "@type": "Person", name: author.display_name } : undefined,
     url,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    publisher: { "@type": "Organization", name: "The Daily Byte" },
+    publisher: { "@type": "Organization", name: "The Daily Byte", logo: { "@type": "ImageObject", url: new URL("/brand/logo-mark.svg", url).toString(), width: 512, height: 512 } },
   };
 
   return (

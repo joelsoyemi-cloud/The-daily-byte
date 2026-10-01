@@ -4,10 +4,19 @@ import Footer from '@/components/site/Footer';
 import { createClient } from '@/lib/supabase/server';
 import './globals.css';
 
+const metadataBase = new URL(
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://the-dailybyte-nine.vercel.app'
+);
+const defaultSocialImage = {
+  url: new URL('/brand/the-daily-byte-og.png', metadataBase).toString(),
+  width: 1731,
+  height: 909,
+  alt: 'The Daily Byte — news, tech, and culture',
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://the-dailybyte-nine.vercel.app'
-  ),
+  applicationName: 'The Daily Byte',
+  metadataBase,
   title: {
     default: 'The Daily Byte — News, Tech & Entertainment',
     template: '%s | The Daily Byte',
@@ -16,6 +25,11 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: 'The Daily Byte',
     type: 'website',
+    images: [defaultSocialImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: [defaultSocialImage],
   },
 };
 

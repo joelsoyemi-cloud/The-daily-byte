@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandMark from "@/components/brand/BrandMark";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function UnauthorizedPage({
@@ -19,6 +20,7 @@ export default async function UnauthorizedPage({
 
   return (
     <div className="max-w-md mx-auto px-5 py-24 text-center">
+      <BrandMark className="mb-6 h-8 w-8 mx-auto" />
       <h1 className="font-display font-900 text-2xl mb-3">Access denied</h1>
       <p className="text-muted mb-8">
         {reason === "suspended"

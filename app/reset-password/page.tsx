@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BrandMark from "@/components/brand/BrandMark";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -42,6 +43,7 @@ export default function ResetPasswordPage() {
   if (!ready) {
     return (
       <div className="max-w-sm mx-auto px-5 py-24 text-center text-muted">
+        <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         Verifying your reset link…
       </div>
     );
@@ -50,6 +52,7 @@ export default function ResetPasswordPage() {
   if (done) {
     return (
       <div className="max-w-sm mx-auto px-5 py-24 text-center">
+        <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         <h1 className="font-display font-900 text-2xl mb-3">
           Password updated
         </h1>
@@ -60,6 +63,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="max-w-sm mx-auto px-5 py-24">
+      <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-8">
         Set a new password
       </h1>

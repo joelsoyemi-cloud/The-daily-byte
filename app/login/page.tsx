@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import BrandMark from "@/components/brand/BrandMark";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -37,6 +38,7 @@ function LoginForm() {
 
   return (
     <div className="max-w-sm mx-auto px-5 py-24">
+      <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-8">Sign in</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
