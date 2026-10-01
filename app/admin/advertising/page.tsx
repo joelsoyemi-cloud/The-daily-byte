@@ -6,8 +6,8 @@ export default async function AdvertisingPage() {
   const configured = !!process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
   return (
-    <div className="max-w-2xl mx-auto px-5 py-10">
-      <h1 className="font-display font-900 text-2xl mb-6">Advertising</h1>
+    <div className="nr-legacy">
+      <h1 className="font-display font-bold text-2xl mb-6">Advertising</h1>
 
       <div className="border-2 border-line bg-white px-6 py-6">
         <p className="text-xs font-bold uppercase tracking-wide text-muted mb-2">

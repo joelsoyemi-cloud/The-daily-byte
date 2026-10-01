@@ -48,14 +48,14 @@ export default function UsersTable({
 
   return (
     <div>
-      {error && <p className="text-brand text-sm font-medium mb-4">{error}</p>}
-      <ul className="divide-y divide-line border-t border-line">
+      {error && <p role="alert" className="text-brand text-sm font-medium mb-4">{error}</p>}
+      <ul className="divide-y divide-line rounded-2xl border border-line bg-white px-5">
         {users.map((u) => {
           const isSelf = u.id === currentUserId;
           return (
             <li
               key={u.id}
-              className="py-4 flex items-center justify-between gap-4"
+              className="py-5 flex flex-wrap items-center justify-between gap-4"
             >
               <div>
                 <p className="font-semibold">
@@ -64,8 +64,9 @@ export default function UsersTable({
                 </p>
                 <p className="text-xs text-muted capitalize mt-1">{u.status}</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <select
+                  aria-label={"Role for " + u.display_name}
                   value={u.role}
                   disabled={isSelf}
                   onChange={(e) =>

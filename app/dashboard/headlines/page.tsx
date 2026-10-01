@@ -15,8 +15,8 @@ export default async function HeadlinesPage({
   const headlines = await fetchHeadlines(activeCategory);
 
   return (
-    <div className="max-w-4xl mx-auto px-5 py-10">
-      <h1 className="font-display font-900 text-2xl mb-2">Today&apos;s Headlines</h1>
+    <div className="nr-legacy">
+      <h1 className="font-display font-bold text-2xl mb-2">Today&apos;s Headlines</h1>
       <p className="text-sm text-muted mb-6">
         Real, current stories — start a blank draft, or let AI write a first
         pass for you to review. Nothing publishes until an editor approves it.

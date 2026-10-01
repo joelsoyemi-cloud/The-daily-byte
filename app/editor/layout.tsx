@@ -22,7 +22,7 @@ export default async function EditorLayout({
 }) {
   const profile = await requireEditor();
   return (
-    <DashboardShell profile={profile} areaLabel="Editorial" nav={NAV}>
+    <DashboardShell profile={profile} workspace="editorial" nav={NAV}>
       {children}
     </DashboardShell>
   );

@@ -1,3 +1,4 @@
+import PublicChrome from '@/components/site/PublicChrome';
 import type { Metadata } from 'next';
 import Header from '@/components/site/Header';
 import Footer from '@/components/site/Footer';
@@ -52,9 +53,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           ],
         }).replace(/</g, '\\u003c') }} />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-ink">Skip to content</a>
-        <Header categories={categories ?? []} hasBreaking={(breakingCount ?? 0) > 0} />
+        <PublicChrome><Header categories={categories ?? []} hasBreaking={(breakingCount ?? 0) > 0} /></PublicChrome>
         <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 scroll-mt-40">{children}</main>
-        <Footer categories={categories ?? []} />
+        <PublicChrome><Footer categories={categories ?? []} /></PublicChrome>
       </body>
     </html>
   );

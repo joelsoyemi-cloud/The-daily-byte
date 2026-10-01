@@ -7,11 +7,6 @@ import DashboardShell, {
 
 const NAV: NavItem[] = [
   { href: "/admin", label: "Overview" },
-  { href: "/editor/submissions", label: "Submission Queue" },
-  { href: "/editor/articles", label: "Articles" },
-  { href: "/editor/categories", label: "Categories" },
-  { href: "/editor/media", label: "Media" },
-  { href: "/editor/activity", label: "Review Activity" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/roles", label: "Roles" },
   { href: "/admin/settings", label: "Platform Settings" },
@@ -25,7 +20,7 @@ export default async function AdminLayout({
 }) {
   const profile = await requireAdmin();
   return (
-    <DashboardShell profile={profile} areaLabel="Admin" nav={NAV}>
+    <DashboardShell profile={profile} workspace="admin" nav={NAV}>
       {children}
     </DashboardShell>
   );

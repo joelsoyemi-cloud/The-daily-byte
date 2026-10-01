@@ -56,6 +56,7 @@ export default function NewArticleForm({
 
   return (
     <PostForm
+      headingLevel="h2"
       categories={categories}
       allowEditorialFields={false}
       actions={[

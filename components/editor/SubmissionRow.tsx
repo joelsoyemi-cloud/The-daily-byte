@@ -1,4 +1,6 @@
 "use client";
+import { StatusBadge } from "@/components/dashboard/WorkspaceUI";
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -6,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/posts";
 
-type Submission = {
+export type Submission = {
   id: string;
   title: string;
   slug: string;
@@ -85,10 +87,10 @@ export default function SubmissionRow({ post }: { post: Submission }) {
   }
 
   return (
-    <li className="py-4">
-      <div className="flex items-center justify-between gap-4 mb-2">
+    <li className="px-5 py-6 border-b border-line last:border-b-0">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
         <div className="min-w-0">
-          <p className="font-semibold truncate">{post.title}</p>
+          <StatusBadge status={post.status} /><h3 className="font-display font-bold text-lg leading-snug mt-3 mb-2 [overflow-wrap:anywhere]">{post.title}</h3>
           <p className="text-xs text-muted mt-1">
             by {post.profiles?.display_name ?? "Unknown"} &middot;{" "}
             {post.categories?.name ?? "Uncategorized"} &middot;{" "}
@@ -112,40 +114,40 @@ export default function SubmissionRow({ post }: { post: Submission }) {
         </div>
         <Link
           href={`/editor/articles/${post.id}/edit`}
-          className="text-xs font-bold uppercase tracking-wide text-muted hover:text-ink shrink-0"
+          className="nr-row-action"
         >
-          Read/Edit/Schedule
+          Read / Edit / Schedule
         </Link>
       </div>
 
-      {error && <p className="text-brand text-xs font-medium mb-2">{error}</p>}
+      {error && <p role="alert" className="text-brand text-xs font-medium mb-2">{error}</p>}
 
-      <div className="flex gap-3 text-xs font-bold uppercase tracking-wide">
+      <div className="flex flex-wrap gap-2 text-xs font-bold">
         <button
           onClick={handleApprove}
           disabled={!!working}
-          className="text-gold hover:underline disabled:opacity-50"
+          className="border border-line px-3 text-[#805c10] hover:bg-surface disabled:opacity-50"
         >
           {working === "approved" ? "Working…" : "Approve"}
         </button>
         <button
           onClick={handlePublish}
           disabled={!!working}
-          className="text-accent hover:underline disabled:opacity-50"
+          className="border border-line px-3 text-accent hover:bg-surface disabled:opacity-50"
         >
           {working === "published" ? "Publishing…" : "Publish Now"}
         </button>
         <button
           onClick={handleRequestChanges}
           disabled={!!working}
-          className="text-gold hover:underline disabled:opacity-50"
+          className="border border-line px-3 text-[#805c10] hover:bg-surface disabled:opacity-50"
         >
           Request Changes
         </button>
         <button
           onClick={handleReject}
           disabled={!!working}
-          className="text-brand hover:underline disabled:opacity-50"
+          className="border border-line px-3 text-brand hover:bg-surface disabled:opacity-50"
         >
           Reject
         </button>

@@ -44,12 +44,14 @@ export default function PostForm({
   actions,
   reviewerNote,
   allowEditorialFields = false,
+  headingLevel = "h1",
 }: {
   initialValues?: Partial<ArticleValues>;
   categories: { id: string; name: string }[];
   actions: ArticleAction[];
   reviewerNote?: string | null;
   allowEditorialFields?: boolean;
+  headingLevel?: "h1" | "h2";
 }) {
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [slug, setSlug] = useState(initialValues?.slug ?? "");
@@ -138,8 +140,8 @@ export default function PostForm({
     setError(null);
     try {
       setCoverImage(await uploadMedia(file));
-    } catch (err: any) {
-      setError(err.message ?? "Cover image upload failed.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Cover image upload failed.");
     } finally {
       setUploadingCover(false);
       e.target.value = "";
@@ -156,8 +158,8 @@ export default function PostForm({
         const url = await uploadMedia(file);
         insertBlock(`![${file.name.replace(/\.[^.]+$/, "")}](${url})`);
       }
-    } catch (err: any) {
-      setError(err.message ?? "Image upload failed.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Image upload failed.");
     } finally {
       setUploadingImage(false);
       e.target.value = "";
@@ -172,8 +174,8 @@ export default function PostForm({
     try {
       const url = await uploadMedia(file);
       insertBlock(videoFileEmbed(url));
-    } catch (err: any) {
-      setError(err.message ?? "Video upload failed.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Video upload failed.");
     } finally {
       setUploadingVideo(false);
       e.target.value = "";
@@ -212,13 +214,14 @@ export default function PostForm({
         featured,
         breaking,
       });
-    } catch (err: any) {
-      setError(err.message ?? "Something went wrong.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setRunningAction(null);
     }
   }
 
+  const Heading = headingLevel;
   const canSubmit = !!title && !!content;
 
   const toolbarBtn = (label: string, onClick: () => void, title?: string) => (
@@ -227,6 +230,7 @@ export default function PostForm({
       type="button"
       onClick={onClick}
       title={title}
+      aria-label={title || label}
       className="px-2.5 py-1.5 text-sm font-bold border-r border-line last:border-r-0 hover:bg-surface"
     >
       {label}
@@ -234,13 +238,13 @@ export default function PostForm({
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-5 py-10">
+    <div className="nr-story-form max-w-4xl mx-auto px-5 py-10">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display font-900 text-2xl">Article</h1>
+        <Heading className="font-display font-bold text-2xl">Story editor</Heading>
         <button
           type="button"
           onClick={() => setShowPreview((s) => !s)}
-          className="text-xs font-bold uppercase tracking-wide text-muted hover:text-brand"
+          aria-pressed={showPreview} className="nr-button nr-button-secondary"
         >
           {showPreview ? "Edit" : "Preview"}
         </button>
@@ -257,18 +261,18 @@ export default function PostForm({
 
       {showPreview ? (
         <div className="border-2 border-line bg-white px-6 py-8">
-          <h1 className="font-display font-900 text-3xl leading-tight mb-6">
+          <h2 className="font-display font-bold text-3xl leading-tight mb-6">
             {title || "Untitled"}
-          </h1>
+          </h2>
           <Markdown content={content || "*Nothing to preview yet.*"} />
         </div>
       ) : (
         <div className="space-y-5">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+            <label htmlFor="story-title" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
               Headline
             </label>
-            <input
+            <input id="story-title"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-lg font-semibold"
@@ -277,10 +281,10 @@ export default function PostForm({
 
           <div className="grid sm:grid-cols-3 gap-5">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+              <label htmlFor="story-categoryId" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
                 Category
               </label>
-              <select
+              <select id="story-categoryId"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
@@ -294,10 +298,10 @@ export default function PostForm({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+              <label htmlFor="story-contentType" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
                 Content type
               </label>
-              <select
+              <select id="story-contentType"
                 value={contentType}
                 onChange={(e) => setContentType(e.target.value)}
                 className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm capitalize"
@@ -311,28 +315,28 @@ export default function PostForm({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+              <label htmlFor="story-slug" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
                 Slug
               </label>
               <div className="flex items-center border-2 border-line focus-within:border-ink bg-white overflow-hidden">
                 <span className="pl-3 text-muted text-sm">/blog/</span>
-                <input
+                <input id="story-slug"
                   value={slug}
                   onChange={(e) => {
                     setSlugTouched(true);
                     setSlug(slugify(e.target.value));
                   }}
-                  className="flex-1 px-1 py-2 text-sm"
+                  className="min-w-0 flex-1 px-1 py-2 text-sm"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+            <label htmlFor="story-excerpt" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
               Excerpt / deck
             </label>
-            <textarea
+            <textarea id="story-excerpt"
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={2}
@@ -341,11 +345,11 @@ export default function PostForm({
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+            <label htmlFor="story-coverImage" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
               Cover image
             </label>
-            <div className="flex gap-2">
-              <input
+            <div className="flex flex-wrap gap-2">
+              <input id="story-coverImage"
                 value={coverImage}
                 onChange={(e) => setCoverImage(e.target.value)}
                 className="flex-1 border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
@@ -378,13 +382,13 @@ export default function PostForm({
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+            <label htmlFor="story-tags" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
               Tags{" "}
               <span className="text-muted normal-case font-normal">
                 (comma-separated)
               </span>
             </label>
-            <input
+            <input id="story-tags"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
               placeholder="e.g. elections, lagos, economy"
@@ -393,7 +397,7 @@ export default function PostForm({
           </div>
 
           {allowEditorialFields && (
-            <div className="flex gap-6 border-2 border-gold bg-gold/5 px-4 py-3">
+            <div className="flex flex-wrap gap-6 border-2 border-gold bg-gold/5 px-4 py-3">
               <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                 <input
                   type="checkbox"
@@ -414,10 +418,10 @@ export default function PostForm({
           )}
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+            <label htmlFor="story-content" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
               Article body
             </label>
-            <div className="border-2 border-line border-b-0 bg-surface flex flex-wrap items-center">
+            <div role="group" aria-label="Story formatting" className="border-2 border-line border-b-0 bg-surface flex flex-wrap items-center">
               {toolbarBtn("B", () => insertAtCursor("**", "**"), "Bold")}
               {toolbarBtn("i", () => insertAtCursor("*", "*"), "Italic")}
               {toolbarBtn("H2", () => insertBlock("## Heading"), "Heading")}
@@ -435,7 +439,7 @@ export default function PostForm({
                 },
                 "Link",
               )}
-              <div className="ml-auto flex text-xs font-bold uppercase tracking-wide">
+              <div className="ml-auto flex flex-wrap text-xs font-bold uppercase tracking-wide">
                 <input
                   ref={imageInputRef}
                   type="file"
@@ -476,7 +480,7 @@ export default function PostForm({
                 </button>
               </div>
             </div>
-            <textarea
+            <textarea id="story-content"
               ref={contentRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -496,10 +500,10 @@ export default function PostForm({
             </summary>
             <div className="mt-3 space-y-3">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+                <label htmlFor="story-seoTitle" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
                   SEO title
                 </label>
-                <input
+                <input id="story-seoTitle"
                   value={seoTitle}
                   onChange={(e) => setSeoTitle(e.target.value)}
                   placeholder="Defaults to the headline if left blank"
@@ -507,10 +511,10 @@ export default function PostForm({
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+                <label htmlFor="story-seoDescription" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
                   SEO description
                 </label>
-                <textarea
+                <textarea id="story-seoDescription"
                   value={seoDescription}
                   onChange={(e) => setSeoDescription(e.target.value)}
                   rows={2}
@@ -523,7 +527,7 @@ export default function PostForm({
         </div>
       )}
 
-      {error && <p className="text-brand text-sm font-medium mt-4">{error}</p>}
+      {error && <p role="alert" className="text-brand text-sm font-medium mt-4">{error}</p>}
 
       <div className="flex items-center gap-3 mt-8 flex-wrap">
         {actions.map((action) => (

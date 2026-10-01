@@ -13,8 +13,8 @@ export default async function CategoriesPage() {
     .order("name");
 
   return (
-    <div className="max-w-2xl mx-auto px-5 py-10">
-      <h1 className="font-display font-900 text-2xl mb-6">Categories</h1>
+    <div className="nr-legacy">
+      <h1 className="font-display font-bold text-2xl mb-6">Categories</h1>
       <CategoriesManager categories={categories ?? []} />
     </div>
   );

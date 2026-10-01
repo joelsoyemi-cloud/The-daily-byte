@@ -32,8 +32,8 @@ export default async function RolesPage() {
   await requireAdmin();
 
   return (
-    <div className="max-w-2xl mx-auto px-5 py-10">
-      <h1 className="font-display font-900 text-2xl mb-2">Roles</h1>
+    <div className="nr-legacy">
+      <h1 className="font-display font-bold text-2xl mb-2">Roles</h1>
       <p className="text-muted text-sm mb-6">
         What each role can actually do — enforced at the database level, not
         just hidden in the UI. To change someone&apos;s role, go to Users.
@@ -42,7 +42,7 @@ export default async function RolesPage() {
       <ul className="divide-y divide-line border-t border-line">
         {ROLES.map((r) => (
           <li key={r.name} className="py-4">
-            <p className="font-display font-700 mb-1">{r.name}</p>
+            <p className="font-display font-bold mb-1">{r.name}</p>
             <p className="text-sm text-muted">{r.description}</p>
           </li>
         ))}

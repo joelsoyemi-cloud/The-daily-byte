@@ -51,7 +51,7 @@ export default function MediaLibrary() {
           .data.publicUrl;
         const isVideo = /\.(mp4|webm|mov)$/i.test(f.name);
         return (
-          <li key={f.name} className="border-2 border-line bg-white p-2">
+          <li key={f.name} className="rounded-2xl border border-line bg-white p-3 shadow-soft">
             {isVideo ? (
               <div className="w-full aspect-square bg-ink flex items-center justify-center text-white text-xs">
                 Video
@@ -61,10 +61,12 @@ export default function MediaLibrary() {
               <img
                 src={url}
                 alt=""
-                className="w-full aspect-square object-cover"
+                className="w-full aspect-square rounded-xl object-cover"
               />
             )}
+            <p className="mt-3 text-xs text-muted [overflow-wrap:anywhere]">{f.name}</p>
             <button
+              aria-label={"Delete " + f.name}
               onClick={() => handleDelete(f.name)}
               className="mt-2 text-[11px] font-bold uppercase tracking-wide text-brand hover:underline w-full text-left"
             >

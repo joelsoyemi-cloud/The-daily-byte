@@ -51,8 +51,9 @@ export default function CategoriesManager({
 
   return (
     <div>
-      <form onSubmit={handleAdd} className="flex gap-2 mb-6">
+      <form onSubmit={handleAdd} className="flex flex-wrap gap-2 mb-6">
         <input
+          aria-label="New category name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="New category name"
@@ -67,11 +68,11 @@ export default function CategoriesManager({
         </button>
       </form>
 
-      {error && <p className="text-brand text-sm font-medium mb-4">{error}</p>}
+      {error && <p role="alert" className="text-brand text-sm font-medium mb-4">{error}</p>}
 
-      <ul className="divide-y divide-line border-t border-line">
+      <ul className="divide-y divide-line rounded-2xl border border-line bg-white px-5">
         {categories.map((c) => (
-          <li key={c.id} className="py-3 flex items-center justify-between">
+          <li key={c.id} className="py-3 flex items-center justify-between gap-4">
             <span className="font-medium">{c.name}</span>
             <button
               onClick={() => handleDelete(c.id)}

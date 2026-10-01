@@ -1,20 +1,7 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-
+import { PageHeading, Panel } from "@/components/dashboard/WorkspaceUI";
 export default async function SettingsPage() {
   await requireAdmin();
-
-  return (
-    <div className="max-w-2xl mx-auto px-5 py-10">
-      <h1 className="font-display font-900 text-2xl mb-6">Platform Settings</h1>
-      <div className="border-2 border-dashed border-line rounded px-6 py-10 text-center">
-        <p className="text-muted text-sm">
-          Nothing configurable here yet — no platform_settings table exists in
-          the database. This page is a placeholder until specific settings (site
-          name, default author bio, moderation rules, etc.) are actually needed,
-          at which point a real table and form belong here instead of hardcoded
-          values.
-        </p>
-      </div>
-    </div>
-  );
+  return <div><PageHeading eyebrow="Publication operations" title="Platform settings" description="Manage the people and permissions behind the publication." /><Panel title="People & access"><div className="nr-action-list"><Link href="/admin/users">Manage users and access <span aria-hidden="true">↗</span></Link><Link href="/admin/roles">Review role permissions <span aria-hidden="true">↗</span></Link></div></Panel><section className="nr-callout"><h2>Publication configuration</h2><p>There are no additional settings to change here yet. Operational configuration is managed by your deployment administrator.</p></section></div>;
 }

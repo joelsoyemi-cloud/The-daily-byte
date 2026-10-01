@@ -7,8 +7,8 @@ import DashboardShell, {
 
 const NAV: NavItem[] = [
   { href: "/dashboard", label: "Overview" },
-  { href: "/dashboard/articles", label: "My Articles" },
-  { href: "/dashboard/articles/new", label: "New Article" },
+  { href: "/dashboard/articles", label: "My Stories" },
+  { href: "/dashboard/articles/new", label: "Create Story" },
   { href: "/dashboard/headlines", label: "Headlines" },
   { href: "/dashboard/profile", label: "Profile" },
 ];
@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   const profile = await requireContributor();
 
   return (
-    <DashboardShell profile={profile} areaLabel="Contributor" nav={NAV}>
+    <DashboardShell profile={profile} workspace="writing" nav={NAV}>
       {children}
     </DashboardShell>
   );
