@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useId, useRef, useState, useEffect } from "react";
+import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import StoryCard, { type StoryCardPost } from "@/components/site/StoryCard";
 
 export default function Rail({ posts }: { posts: StoryCardPost[] }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const scrollerId = useId();
+  const reducedMotion = useReducedMotion();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -17,20 +20,27 @@ export default function Rail({ posts }: { posts: StoryCardPost[] }) {
 
   useEffect(() => {
     updateArrows();
-  }, []);
+    const observer = new ResizeObserver(updateArrows);
+    if (scrollerRef.current) observer.observe(scrollerRef.current);
+    return () => observer.disconnect();
+  }, [posts]);
 
   function scrollBy(dir: 1 | -1) {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: "smooth" });
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reducedMotion ? "instant" : "smooth" });
   }
 
   return (
-    <div className="relative">
+    <div className="relative min-w-0">
       <div
+        id={scrollerId}
+        tabIndex={0}
+        role="region"
+        aria-label="Scrollable stories"
         ref={scrollerRef}
         onScroll={updateArrows}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory motion-safe:scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {posts.map((post) => (
           <div
@@ -45,7 +55,9 @@ export default function Rail({ posts }: { posts: StoryCardPost[] }) {
       <button
         onClick={() => scrollBy(-1)}
         aria-label="Scroll left"
-        className={`hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-soft-lg items-center justify-center transition-opacity duration-200 ${
+        aria-controls={scrollerId}
+        disabled={!canScrollLeft}
+        className={`hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white shadow-soft-lg items-center justify-center motion-safe:transition-opacity motion-safe:duration-200 ${
           canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -67,7 +79,9 @@ export default function Rail({ posts }: { posts: StoryCardPost[] }) {
       <button
         onClick={() => scrollBy(1)}
         aria-label="Scroll right"
-        className={`hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-soft-lg items-center justify-center transition-opacity duration-200 ${
+        aria-controls={scrollerId}
+        disabled={!canScrollRight}
+        className={`hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white shadow-soft-lg items-center justify-center motion-safe:transition-opacity motion-safe:duration-200 ${
           canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >

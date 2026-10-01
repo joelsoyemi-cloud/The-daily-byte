@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { motion, useMotionValue, useSpring } from "motion/react";
+import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { softSpring } from "@/components/motion/Reveal";
 
 export function ArticleReadingProgress({ targetId }: { targetId: string }) {

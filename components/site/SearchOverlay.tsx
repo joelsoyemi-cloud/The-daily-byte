@@ -3,7 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { softSpring } from "@/components/motion/Reveal";
 import { createClient } from "@/lib/supabase/client";
 
@@ -129,6 +130,13 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
       aria-modal="true"
       onCancel={(event) => { event.preventDefault(); onClose(); }}
       onKeyDown={(event) => {
+        // Search inputs can consume Escape to clear their value before dialog cancel.
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          onClose();
+          return;
+        }
         if (event.key !== "Tab") return;
         const controls = [...event.currentTarget.querySelectorAll<HTMLElement>(
           'button:not([disabled]), input:not([disabled]), a[href], [tabindex="0"]',

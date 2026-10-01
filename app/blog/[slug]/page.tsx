@@ -180,7 +180,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <StaggerItem>
               <div className="mt-7 flex flex-col gap-4 border-t border-line pt-6 sm:mt-9 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="min-w-0 space-y-2">
-                  {author?.display_name && <p className="text-sm text-muted">By <span className="font-semibold text-ink [overflow-wrap:anywhere]">{author.display_name}</span></p>}
+                  {author?.display_name && <p className="text-sm text-muted">By {author.username ? <Link href={`/author/${encodeURIComponent(author.username)}`} className="font-semibold text-ink underline-offset-4 hover:text-brand hover:underline [overflow-wrap:anywhere]">{author.display_name}</Link> : <span className="font-semibold text-ink [overflow-wrap:anywhere]">{author.display_name}</span>}</p>}
                   {(published || modified) && <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs leading-relaxed text-muted sm:text-sm">
                     {published && <span>Published <time dateTime={published}>{displayDate(published)}</time></span>}
                     {modified && <span>Updated <time dateTime={modified}>{displayDate(modified)}</time></span>}
@@ -219,7 +219,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-widest text-muted">About the author</p>
-                  <h2 id="article-author" className="mt-2 font-display text-xl font-bold [overflow-wrap:anywhere]">{author.display_name || "Author"}</h2>
+                  <h2 id="article-author" className="mt-2 font-display text-xl font-bold [overflow-wrap:anywhere]">{author.username ? <Link href={`/author/${encodeURIComponent(author.username)}`} className="inline-block rounded-lg underline-offset-4 hover:text-brand hover:underline motion-safe:transition-colors">{author.display_name || author.username}</Link> : author.display_name || "Author"}</h2>
                   {author.username && <p className="mt-1 text-sm text-muted [overflow-wrap:anywhere]">@{author.username}</p>}
                   {author.bio && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-muted [overflow-wrap:anywhere]">{author.bio}</p>}
                 </div>

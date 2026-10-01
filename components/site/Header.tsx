@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, useScroll, useTransform, useReducedMotion, AnimatePresence } from 'motion/react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { useReducedMotion } from '@/components/motion/useReducedMotion';
 import { createClient } from '@/lib/supabase/client';
 import { softSpring } from '@/components/motion/Reveal';
 import SearchOverlay from '@/components/site/SearchOverlay';
+import MobileMenu from '@/components/site/MobileMenu';
 
 type NavCategory = { name: string; slug: string };
 
@@ -24,6 +26,7 @@ export default function Header({
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [role, setRole] = useState<string | null>(null);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   const { scrollY } = useScroll();
   const paddingY = useTransform(scrollY, [0, 80], [20, 10]);
@@ -51,7 +54,7 @@ export default function Header({
 
   const navItems = [
     { label: 'Latest', href: '/' },
-    ...categories.map((c) => ({ label: c.name, href: `/section/${c.slug}` })),
+    ...categories.map((c) => ({ label: c.name, href: `/section/${encodeURIComponent(c.slug)}` })),
     { label: 'Opinions', href: '/opinions' },
     { label: 'Videos', href: '/videos' },
   ];
@@ -59,42 +62,43 @@ export default function Header({
   return (
     <>
       <motion.header
-        style={{ paddingTop: paddingY, paddingBottom: paddingY }}
-        className="sticky top-0 z-40 px-5"
+        style={{ paddingTop: shouldReduceMotion ? 16 : paddingY, paddingBottom: shouldReduceMotion ? 16 : paddingY }}
+        className="sticky top-0 z-40 px-4 sm:px-5"
       >
         <motion.div
-          style={{ opacity: bgOpacity }}
+          style={{ opacity: shouldReduceMotion ? 1 : bgOpacity }}
           className="absolute inset-0 bg-paper/80 backdrop-blur-md"
         />
         <motion.div
-          style={{ opacity: borderOpacity }}
+          style={{ opacity: shouldReduceMotion ? 1 : borderOpacity }}
           className="absolute inset-x-0 bottom-0 h-px bg-line"
         />
 
-        <div className="relative max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <motion.div style={{ scale: logoScale }} className="origin-left">
-            <Link href="/" className="font-display font-900 text-2xl tracking-tight">
+        <div className="relative max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-x-2 gap-y-3 sm:gap-x-4">
+          <motion.div style={{ scale: shouldReduceMotion ? 1 : logoScale }} className="shrink-0 origin-left">
+            <Link href="/" className="inline-flex min-h-11 items-center whitespace-nowrap font-display font-black text-lg tracking-tight sm:text-2xl">
               The Daily<span className="text-brand">Byte</span>
             </Link>
           </motion.div>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav aria-label="Main navigation" className="order-last hidden w-full min-w-0 flex-wrap items-center justify-center gap-1 border-t border-line/60 pt-2 lg:flex">
             {navItems.map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative px-3 py-2 text-sm font-semibold rounded-full transition-colors ${
+                  aria-current={active ? 'page' : undefined}
+                  className={`relative max-w-full min-h-11 inline-flex items-center px-3 py-2 text-sm font-semibold rounded-full motion-safe:transition-colors [overflow-wrap:anywhere] ${
                     active ? 'text-brand' : 'text-ink/70 hover:text-ink'
                   }`}
                 >
                   {item.label}
                   {active && (
                     <motion.span
-                      layoutId="nav-active"
+                      layoutId={shouldReduceMotion ? undefined : "nav-active"}
                       className="absolute inset-x-3 -bottom-0.5 h-0.5 bg-brand rounded-full"
-                      transition={softSpring}
+                      transition={shouldReduceMotion ? { duration: 0 } : softSpring}
                     />
                   )}
                 </Link>
@@ -102,11 +106,11 @@ export default function Header({
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             {hasBreaking && (
               <Link
                 href="/#breaking"
-                className="hidden sm:flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wide"
+                className="hidden sm:flex min-h-11 items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wide"
               >
                 <span className="relative flex h-2 w-2">
                   {!shouldReduceMotion && (
@@ -121,7 +125,7 @@ export default function Header({
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className="p-2.5 rounded-full hover:bg-surface transition-colors"
+              className="h-11 w-11 flex items-center justify-center rounded-full hover:bg-surface motion-safe:transition-colors"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="7" />
@@ -131,7 +135,7 @@ export default function Header({
 
             <Link
               href={role ? dashboardHref : '/signup'}
-              className="hidden sm:inline-block px-4 py-2 rounded-full bg-ink text-white text-sm font-semibold hover:bg-brand transition-colors"
+              className="hidden sm:inline-flex min-h-11 items-center whitespace-nowrap px-4 py-2 rounded-full bg-ink text-white text-sm font-semibold hover:bg-brand motion-safe:transition-colors"
             >
               {role ? 'Dashboard' : 'Write for us'}
             </Link>
@@ -139,7 +143,9 @@ export default function Header({
             <button
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
-              className="lg:hidden p-2.5 rounded-full hover:bg-surface transition-colors"
+              aria-expanded={menuOpen}
+              aria-haspopup="dialog"
+              className="lg:hidden h-11 w-11 flex items-center justify-center rounded-full hover:bg-surface motion-safe:transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
@@ -150,69 +156,7 @@ export default function Header({
       </motion.header>
 
       <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm lg:hidden"
-            onClick={() => setMenuOpen(false)}
-          >
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={softSpring}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-0 bottom-0 w-[80%] max-w-sm bg-paper shadow-soft-lg px-6 py-6 rounded-l-3xl"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <span className="font-display font-900 text-lg">Menu</span>
-                <button
-                  onClick={() => setMenuOpen(false)}
-                  aria-label="Close menu"
-                  className="p-2 rounded-full hover:bg-surface"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-                  </svg>
-                </button>
-              </div>
-
-              <motion.nav
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
-                className="flex flex-col gap-1"
-              >
-                {navItems.map((item) => (
-                  <motion.div
-                    key={item.href}
-                    variants={{ hidden: { opacity: 0, x: 16 }, visible: { opacity: 1, x: 0 } }}
-                  >
-                    <Link
-                      href={item.href}
-                      className="block px-3 py-3 rounded-2xl text-lg font-semibold hover:bg-surface transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  </motion.div>
-                ))}
-                <motion.div
-                  variants={{ hidden: { opacity: 0, x: 16 }, visible: { opacity: 1, x: 0 } }}
-                  className="mt-4 pt-4 border-t border-line"
-                >
-                  <Link
-                    href={role ? dashboardHref : '/signup'}
-                    className="block px-3 py-3 rounded-2xl bg-ink text-white text-center font-semibold"
-                  >
-                    {role ? 'Dashboard' : 'Write for us'}
-                  </Link>
-                </motion.div>
-              </motion.nav>
-            </motion.div>
-          </motion.div>
-        )}
+        {menuOpen && <MobileMenu items={navItems} pathname={pathname} dashboardHref={role ? dashboardHref : '/signup'} dashboardLabel={role ? 'Dashboard' : 'Write for us'} onClose={closeMenu} />}
       </AnimatePresence>
 
       <AnimatePresence>

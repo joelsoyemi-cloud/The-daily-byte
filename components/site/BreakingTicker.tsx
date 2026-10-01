@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import BreakingTickerTrack from '@/components/site/BreakingTickerTrack';
 
 export default async function BreakingTicker() {
   const supabase = await createClient();
@@ -16,29 +17,17 @@ export default async function BreakingTicker() {
 
   return (
     <div id="breaking" className="bg-ink text-white overflow-hidden">
-      <div className="max-w-6xl mx-auto flex items-center">
+      <div className="max-w-6xl mx-auto flex min-w-0 items-center">
         <span className="shrink-0 bg-brand px-4 py-2.5 text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
           Breaking
         </span>
 
         {posts.length === 1 ? (
-          <Link href={`/blog/${posts[0].slug}`} className="px-4 py-2.5 text-sm font-medium hover:text-brand transition-colors truncate">
+          <Link href={`/blog/${posts[0].slug}`} className="min-h-11 min-w-0 px-4 py-2.5 text-sm font-medium hover:text-white/75 motion-safe:transition-colors truncate">
             {posts[0].title}
           </Link>
         ) : (
-          <div className="flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
-            <div className="flex motion-safe:animate-ticker whitespace-nowrap py-2.5">
-              {[...posts, ...posts].map((post, i) => (
-                <Link
-                  key={i}
-                  href={`/blog/${post.slug}`}
-                  className="px-6 text-sm font-medium hover:text-brand transition-colors shrink-0"
-                >
-                  {post.title}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <BreakingTickerTrack posts={posts} />
         )}
       </div>
     </div>

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { StaggerReveal, StaggerItem } from "@/components/motion/Reveal";
 
-type OpinionPost = {
+export type OpinionPost = {
   slug: string;
   title: string;
   excerpt: string | null;
   published_at: string | null;
-  profiles?: { display_name: string } | null;
+  profiles?: { display_name: string; username: string | null } | null;
 };
 
 export default function TypographyList({ posts }: { posts: OpinionPost[] }) {
@@ -16,12 +16,12 @@ export default function TypographyList({ posts }: { posts: OpinionPost[] }) {
       staggerDelay={0.05}
     >
       {posts.map((post) => (
-        <StaggerItem key={post.slug}>
+        <StaggerItem key={post.slug} className="min-w-0 py-6 sm:py-8 [overflow-wrap:anywhere]">
           <Link
             href={`/blog/${post.slug}`}
-            className="group block py-6 sm:py-8"
+            className="group block rounded-lg"
           >
-            <h3 className="font-display font-700 text-xl sm:text-2xl lg:text-3xl leading-snug transition-colors duration-200 group-hover:text-brand">
+            <h3 className="font-display font-bold text-xl sm:text-2xl lg:text-3xl leading-snug motion-safe:transition-colors motion-safe:duration-200 group-hover:text-brand">
               {post.title}
             </h3>
             {post.excerpt && (
@@ -29,25 +29,22 @@ export default function TypographyList({ posts }: { posts: OpinionPost[] }) {
                 {post.excerpt}
               </p>
             )}
-            <div className="flex items-center gap-2 mt-3 text-sm text-muted">
+          </Link>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-sm text-muted">
               {post.profiles?.display_name && (
-                <span className="font-medium text-ink">
-                  {post.profiles.display_name}
-                </span>
+                post.profiles.username ? <Link href={`/author/${encodeURIComponent(post.profiles.username)}`} className="inline-flex min-h-11 items-center font-medium text-ink hover:text-brand">{post.profiles.display_name}</Link> : <span className="font-medium text-ink">{post.profiles.display_name}</span>
               )}
-              {post.published_at && (
-                <>
-                  <span>&middot;</span>
-                  <span>
+              {post.published_at && !Number.isNaN(Date.parse(post.published_at)) && (
+                  <time dateTime={post.published_at}>
                     {new Date(post.published_at).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
+                      year: "numeric",
+                      timeZone: "UTC",
                     })}
-                  </span>
-                </>
+                  </time>
               )}
             </div>
-          </Link>
         </StaggerItem>
       ))}
     </StaggerReveal>

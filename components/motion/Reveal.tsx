@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, useReducedMotion, type Variants } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
+import { useReducedMotion } from './useReducedMotion';
 
 export const softSpring = { type: 'spring' as const, stiffness: 260, damping: 26, mass: 0.9 };
 
@@ -78,6 +79,8 @@ export function StaggerItem({
   children: React.ReactNode;
   className?: string;
 }) {
+  const shouldReduceMotion = useReducedMotion();
+  if (shouldReduceMotion) return <div className={className}>{children}</div>;
   return (
     <motion.div className={className} variants={revealVariants}>
       {children}

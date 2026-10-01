@@ -12,12 +12,12 @@ export default function Section({
 }) {
   return (
     <section className="max-w-6xl mx-auto px-5 py-10 sm:py-14">
-      <Reveal className="flex items-center justify-between mb-6 sm:mb-8">
-        <h2 className="font-display font-900 text-xl sm:text-2xl">{title}</h2>
+      <Reveal className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">
+        <h2 className="font-display font-black text-xl sm:text-2xl [overflow-wrap:anywhere]">{title}</h2>
         {viewAllHref && (
           <Link
             href={viewAllHref}
-            className="text-sm font-semibold text-brand hover:underline flex items-center gap-1"
+            className="min-h-11 shrink-0 text-sm font-semibold text-brand underline-offset-4 hover:underline flex items-center gap-1"
           >
             View all
             <svg

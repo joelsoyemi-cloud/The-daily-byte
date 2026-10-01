@@ -31,7 +31,7 @@ export default async function HomePage() {
     query = id
       ? query.eq("category_id", id)
       : query.eq("category_id", "00000000-0000-0000-0000-000000000000");
-    return query.order("published_at", { ascending: false }).limit(limit);
+    return query.order("published_at", { ascending: false, nullsFirst: false }).limit(limit).returns<StoryCardPost[]>();
   };
 
   const [latest, politics, business, entertainment, tech, sports] =
@@ -40,8 +40,8 @@ export default async function HomePage() {
         .from("posts")
         .select(SELECT)
         .or(visibleFilter())
-        .order("published_at", { ascending: false })
-        .limit(8),
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(8).returns<StoryCardPost[]>(),
       byCategory("politics", 5),
       byCategory("business", 6),
       byCategory("entertainment", 8),
@@ -49,46 +49,45 @@ export default async function HomePage() {
       byCategory("sports", 6),
     ]);
 
-  const cast = (data: unknown) => (data ?? []) as unknown as StoryCardPost[];
-
   return (
     <>
+      <h1 className="sr-only">The Daily Byte: news, tech, and culture</h1>
       <BreakingTicker />
       <Hero />
 
-      {cast(latest.data).length > 0 && (
-        <Section title="Latest News" viewAllHref="/section/general">
-          <ImageGrid posts={cast(latest.data)} />
+      {(latest.data ?? []).length > 0 && (
+        <Section title="Latest News">
+          <ImageGrid posts={latest.data ?? []} />
         </Section>
       )}
 
-      {cast(politics.data).length > 0 && (
+      {(politics.data ?? []).length > 0 && (
         <Section title="Politics" viewAllHref="/section/politics">
-          <LeadPlusGrid posts={cast(politics.data)} />
+          <LeadPlusGrid posts={politics.data ?? []} />
         </Section>
       )}
 
-      {cast(business.data).length > 0 && (
+      {(business.data ?? []).length > 0 && (
         <Section title="Business" viewAllHref="/section/business">
-          <Rail posts={cast(business.data)} />
+          <Rail posts={business.data ?? []} />
         </Section>
       )}
 
-      {cast(entertainment.data).length > 0 && (
+      {(entertainment.data ?? []).length > 0 && (
         <Section title="Entertainment" viewAllHref="/section/entertainment">
-          <ImageGrid posts={cast(entertainment.data)} />
+          <ImageGrid posts={entertainment.data ?? []} />
         </Section>
       )}
 
-      {cast(tech.data).length > 0 && (
+      {(tech.data ?? []).length > 0 && (
         <Section title="Technology" viewAllHref="/section/tech">
-          <ImageGrid posts={cast(tech.data)} />
+          <ImageGrid posts={tech.data ?? []} />
         </Section>
       )}
 
-      {cast(sports.data).length > 0 && (
+      {(sports.data ?? []).length > 0 && (
         <Section title="Sports" viewAllHref="/section/sports">
-          <Rail posts={cast(sports.data)} />
+          <Rail posts={sports.data ?? []} />
         </Section>
       )}
     </>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Header from '@/components/site/Header';
+import Footer from '@/components/site/Footer';
 import { createClient } from '@/lib/supabase/server';
 import './globals.css';
 
@@ -35,13 +36,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className="font-sans antialiased min-h-screen flex flex-col bg-paper text-ink">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-ink">Skip to content</a>
         <Header categories={categories ?? []} hasBreaking={(breakingCount ?? 0) > 0} />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-line mt-20 bg-surface py-10">
-          <div className="max-w-6xl mx-auto px-5 text-sm text-muted flex items-center justify-between">
-            <span>&copy; {new Date().getFullYear()} The Daily Byte</span>
-          </div>
-        </footer>
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 scroll-mt-40">{children}</main>
+        <Footer categories={categories ?? []} />
       </body>
     </html>
   );
