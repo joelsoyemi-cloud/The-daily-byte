@@ -16,6 +16,7 @@ export type Submission = {
   content_type: string;
   updated_at: string;
   profiles: { display_name: string } | null;
+  schools: { name: string } | null;
   categories: { name: string } | null;
   submitted_at: string | null;
   last_action: string | null;
@@ -93,7 +94,7 @@ export default function SubmissionRow({ post }: { post: Submission }) {
           <StatusBadge status={post.status} /><h3 className="font-display font-bold text-lg leading-snug mt-3 mb-2 [overflow-wrap:anywhere]">{post.title}</h3>
           <p className="text-xs text-muted mt-1">
             by {post.profiles?.display_name ?? "Unknown"} &middot;{" "}
-            {post.categories?.name ?? "Uncategorized"} &middot;{" "}
+            {post.schools && <span>{post.schools.name} &middot; </span>}{post.categories?.name ?? "Uncategorized"} &middot;{" "}
             <span className="capitalize">
               {post.content_type.replace("_", " ")}
             </span>

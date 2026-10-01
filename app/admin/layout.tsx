@@ -8,6 +8,7 @@ import DashboardShell, {
 const NAV: NavItem[] = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/schools", label: "Schools" },
   { href: "/admin/roles", label: "Roles" },
   { href: "/admin/settings", label: "Platform Settings" },
   { href: "/admin/advertising", label: "Advertising" },

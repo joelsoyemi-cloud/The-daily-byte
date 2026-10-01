@@ -17,7 +17,7 @@ export default function Footer({ categories }: { categories: { name: string; slu
             </div>
             <nav aria-label="Footer main navigation">
               <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-ink">Explore</h2>
-              <ul><li><Link href="/" className={linkStyle}>Latest stories</Link></li><li><Link href="/opinions" className={linkStyle}>Opinions</Link></li><li><Link href="/videos" className={linkStyle}>Videos</Link></li></ul>
+              <ul><li><Link href="/schools" className={linkStyle}>Campus network</Link></li><li><Link href="/" className={linkStyle}>Latest stories</Link></li><li><Link href="/opinions" className={linkStyle}>Opinions</Link></li><li><Link href="/videos" className={linkStyle}>Videos</Link></li></ul>
               <Link href="/signup" className="mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white hover:bg-brand motion-safe:transition-colors">Write for The Daily Byte <span aria-hidden="true" className="ml-2">&rarr;</span></Link>
             </nav>
             {categories.length > 0 && <nav aria-label="Footer sections" className="min-w-0 sm:col-span-2 lg:col-span-1">

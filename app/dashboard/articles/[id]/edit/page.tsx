@@ -1,3 +1,4 @@
+import { getSchoolOptions } from "@/lib/schools-server";
 import { notFound } from "next/navigation";
 import { requireContributor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -40,8 +41,10 @@ export default async function EditArticlePage({
     <EditArticleForm
       postId={post.id}
       categories={categories ?? []}
+      schools={await getSchoolOptions()}
       reviewerNote={lastReview?.feedback ?? null}
       initialValues={{
+        school_id: post.school_id ?? "",
         title: post.title,
         slug: post.slug,
         category_id: post.category_id ?? "",

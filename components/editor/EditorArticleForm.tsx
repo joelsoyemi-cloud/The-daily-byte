@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { SchoolOption } from "@/lib/schools";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PostForm, { type ArticleValues } from "@/components/PostForm";
@@ -8,11 +9,13 @@ import PostForm, { type ArticleValues } from "@/components/PostForm";
 export default function EditorArticleForm({
   postId,
   categories,
+  schools,
   initialValues,
   currentStatus,
 }: {
   postId: string;
   categories: { id: string; name: string }[];
+  schools: SchoolOption[];
   initialValues: ArticleValues;
   currentStatus: string;
 }) {
@@ -29,6 +32,7 @@ export default function EditorArticleForm({
         title: values.title,
         slug: values.slug,
         category_id: values.category_id || null,
+        school_id: values.school_id || null,
         content_type: values.content_type,
         excerpt: values.excerpt || null,
         cover_image: values.cover_image || null,
@@ -121,6 +125,7 @@ export default function EditorArticleForm({
     <div>
       <PostForm
         categories={categories}
+        schools={schools}
         initialValues={initialValues}
         allowEditorialFields
         actions={[

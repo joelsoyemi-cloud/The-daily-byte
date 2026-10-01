@@ -1,3 +1,4 @@
+import { getSchoolOptions } from "@/lib/schools-server";
 import { notFound } from "next/navigation";
 import { requireEditor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +30,9 @@ export default async function EditorEditArticlePage({
       postId={post.id}
       currentStatus={post.status}
       categories={categories ?? []}
+      schools={await getSchoolOptions()}
       initialValues={{
+        school_id: post.school_id ?? "",
         title: post.title,
         slug: post.slug,
         category_id: post.category_id ?? "",

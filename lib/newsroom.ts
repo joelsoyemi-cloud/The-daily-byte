@@ -1,8 +1,8 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { STORY_STATUSES } from "@/lib/workspaces";
-export const NEWSROOM_STORY_SELECT = "id, title, slug, status, updated_at, profiles(display_name), categories(name)";
-export type NewsroomStory = { id: string; title: string; slug: string; status: string; updated_at: string | null; profiles: { display_name: string | null } | null; categories: { name: string } | null };
+export const NEWSROOM_STORY_SELECT = "id, title, slug, status, updated_at, profiles(display_name), categories(name), schools(name)";
+export type NewsroomStory = { schools: { name: string } | null; id: string; title: string; slug: string; status: string; updated_at: string | null; profiles: { display_name: string | null } | null; categories: { name: string } | null };
 export async function getStoryCounts(authorId?: string) {
   const supabase = await createClient();
   return Promise.all(STORY_STATUSES.map(async status => {

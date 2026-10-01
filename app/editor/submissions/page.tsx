@@ -11,7 +11,7 @@ export default async function SubmissionQueuePage({ searchParams }: { searchPara
   const page = newsroomPage((await searchParams).page);
   const supabase = await createClient();
   const { data: posts, count, error } = await supabase.from("posts")
-    .select("id, title, slug, status, content_type, updated_at, profiles(display_name), categories(name), submission:review_history(created_at), recent_review:review_history(action)", { count: "exact" })
+    .select("id, title, slug, status, content_type, updated_at, profiles(display_name), categories(name), schools(name), submission:review_history(created_at), recent_review:review_history(action)", { count: "exact" })
     .in("status", ["submitted", "under_review"])
     // These embedded filters limit history records only, not the parent queue.
     .eq("submission.action", "submitted")

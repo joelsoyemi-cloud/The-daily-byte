@@ -10,10 +10,10 @@ import { Reveal } from "@/components/motion/Reveal";
 import { publicPageMetadata } from "@/lib/site";
 
 export const revalidate = 0;
-type PublicProfile = { id: string; username: string; display_name: string; bio: string | null; avatar_url: string | null };
+type PublicProfile = { schools: { name: string; slug: string; status: string } | null; id: string; username: string; display_name: string; bio: string | null; avatar_url: string | null };
 const getProfile = cache(async (username: string) => {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("profiles").select("id, username, display_name, bio, avatar_url").eq("username", username).returns<PublicProfile[]>().maybeSingle();
+  const { data, error } = await supabase.from("profiles").select("id, username, display_name, bio, avatar_url, schools(name, slug, status)").eq("username", username).returns<PublicProfile[]>().maybeSingle();
   if (error) throw new Error("Unable to load this author.");
   return data;
 });
@@ -42,6 +42,7 @@ export default async function AuthorPage({ params, searchParams }: { params: Pro
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand">Behind the stories</p>
           <h1 className="mt-3 font-display text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">{profile.display_name || profile.username}</h1>
           <p className="mt-2 text-sm text-muted">@{profile.username}</p>
+          {profile.schools?.status === "active" && <Link href={"/schools/" + encodeURIComponent(profile.schools.slug)} className="mt-2 inline-flex min-h-11 items-center text-sm text-accent hover:underline">{profile.schools.name}</Link>}
           {profile.bio && <p className="mt-5 max-w-2xl whitespace-pre-line text-base leading-relaxed text-muted">{profile.bio}</p>}
         </div>
       </header></Reveal>

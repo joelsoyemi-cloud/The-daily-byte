@@ -1,13 +1,19 @@
 "use client";
 
+import type { SchoolOption } from "@/lib/schools";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PostForm, { type ArticleValues } from "@/components/PostForm";
 
 export default function NewArticleForm({
   categories,
+  schools,
+  defaultSchoolId,
 }: {
   categories: { id: string; name: string }[];
+  schools: SchoolOption[];
+  defaultSchoolId: string | null;
+
 }) {
   const router = useRouter();
   const supabase = createClient();
@@ -27,6 +33,7 @@ export default function NewArticleForm({
         title: values.title,
         slug: values.slug,
         category_id: values.category_id || null,
+        school_id: values.school_id || null,
         content_type: values.content_type,
         excerpt: values.excerpt || null,
         cover_image: values.cover_image || null,
@@ -58,6 +65,8 @@ export default function NewArticleForm({
     <PostForm
       headingLevel="h2"
       categories={categories}
+      schools={schools}
+      initialValues={{ school_id: schools.some(s => s.id === defaultSchoolId) ? defaultSchoolId ?? "" : "" }}
       allowEditorialFields={false}
       actions={[
         {

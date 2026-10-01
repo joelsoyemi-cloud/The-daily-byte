@@ -9,7 +9,7 @@ export const revalidate = 0;
 type RecentUser = { id: string; display_name: string; role: Role; status: string; created_at: string };
 const managementGroups = [
   { title: "Publishing", links: [["/editor/submissions", "Editorial Queue"], ["/editor/articles", "Articles"], ["/editor/categories", "Categories"], ["/editor/media", "Media"], ["/editor/activity", "Review Activity"]] },
-  { title: "People & platform", links: [["/admin/users", "Users"], ["/admin/roles", "Roles"], ["/admin/settings", "Platform Settings"], ["/admin/advertising", "Advertising"]] },
+  { title: "People & platform", links: [["/admin/schools", "Schools"], ["/admin/users", "Users"], ["/admin/roles", "Roles"], ["/admin/settings", "Platform Settings"], ["/admin/advertising", "Advertising"]] },
   { title: "Workspaces & publication", links: [["/dashboard", "Writing Workspace"], ["/editor", "Editorial Workspace"], ["/", "Public Site"]] },
 ];
 export default async function AdminOverview() {

@@ -13,7 +13,7 @@ import { DEFAULT_SOCIAL_IMAGE, feedAlternate, siteUrl } from "@/lib/site";
 
 export const revalidate = 0;
 
-const ARTICLE_SELECT = "id, title, slug, excerpt, content, category, cover_image, published_at, updated_at, author_id, category_id, tags, seo_title, seo_description, categories(name, slug), profiles(id, username, display_name, bio, avatar_url, role)";
+const ARTICLE_SELECT = "id, title, slug, excerpt, content, category, cover_image, published_at, updated_at, author_id, category_id, tags, seo_title, seo_description, schools(name, slug, status), categories(name, slug), profiles(id, username, display_name, bio, avatar_url, role)";
 const STORY_SELECT = "slug, title, excerpt, cover_image, content_type, published_at, categories(name, slug)";
 const visibleFilter = () =>
   `status.eq.published,and(status.eq.scheduled,scheduled_at.lte.${new Date().toISOString()})`;
@@ -170,6 +170,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         }).replace(/</g, "\\u003c") }} />
 
         <Reveal>
+          {post.schools?.status === "active" && <Link href={"/schools/" + encodeURIComponent(post.schools.slug)} className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline [overflow-wrap:anywhere]">{post.schools.name}</Link>}
           <nav aria-label="Breadcrumb" className="text-xs text-muted sm:text-sm">
             <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <li><Link href="/" className="inline-flex min-h-11 items-center font-medium hover:text-brand">Home</Link></li>

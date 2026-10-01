@@ -1,4 +1,7 @@
 "use client";
+import SchoolSelect from "@/components/SchoolSelect";
+import type { SchoolOption } from "@/lib/schools";
+
 
 import { useRef, useState } from "react";
 import { slugify } from "@/lib/posts";
@@ -8,6 +11,7 @@ import Markdown from "./Markdown";
 export type ArticleValues = {
   title: string;
   slug: string;
+  school_id: string;
   category_id: string;
   content_type: string;
   excerpt: string;
@@ -41,6 +45,7 @@ const CONTENT_TYPES = [
 export default function PostForm({
   initialValues,
   categories,
+  schools,
   actions,
   reviewerNote,
   allowEditorialFields = false,
@@ -48,11 +53,13 @@ export default function PostForm({
 }: {
   initialValues?: Partial<ArticleValues>;
   categories: { id: string; name: string }[];
+  schools: SchoolOption[];
   actions: ArticleAction[];
   reviewerNote?: string | null;
   allowEditorialFields?: boolean;
   headingLevel?: "h1" | "h2";
 }) {
+  const [schoolId, setSchoolId] = useState(initialValues?.school_id ?? "");
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [slug, setSlug] = useState(initialValues?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(!!initialValues?.slug);
@@ -201,6 +208,7 @@ export default function PostForm({
         title,
         slug: slug || slugify(title),
         category_id: categoryId,
+        school_id: schoolId,
         content_type: contentType,
         excerpt,
         cover_image: coverImage,
@@ -279,6 +287,7 @@ export default function PostForm({
             />
           </div>
 
+          <SchoolSelect id="story-school" value={schoolId} onChange={setSchoolId} schools={schools} />
           <div className="grid sm:grid-cols-3 gap-5">
             <div>
               <label htmlFor="story-categoryId" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">

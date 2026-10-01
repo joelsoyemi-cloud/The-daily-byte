@@ -11,6 +11,7 @@ export type Post = {
   updated_at: string;
   published_at: string | null;
   author_id: string | null;
+  school_id: string | null;
   category_id: string | null;
   status: string;
   content_type: string;
@@ -29,6 +30,7 @@ export type ArticlePost = Pick<
   | "cover_image" | "published_at" | "updated_at" | "author_id"
   | "category_id" | "seo_title" | "seo_description"
 > & {
+  schools: { name: string; slug: string; status: string } | null;
   tags: string[] | null;
   categories: { name: string; slug: string } | null;
   profiles: {

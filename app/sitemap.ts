@@ -19,13 +19,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
     throw new Error("Sitemap capacity exceeded; split into sitemap files before further growth.");
   }
-  const [posts, categories, profiles] = await Promise.all([
+  const [posts, schools, categories, profiles] = await Promise.all([
     collect((start, end) => supabase.from("posts").select("slug, updated_at").or(visibility).order("id").range(start, end).returns<{ slug: string; updated_at: string }[]>()),
+    collect((start, end) => supabase.from("schools").select("slug").eq("status", "active").order("slug").range(start, end).returns<{ slug: string }[]>()),
     collect((start, end) => supabase.from("categories").select("slug").order("slug").range(start, end).returns<{ slug: string }[]>()),
     collect((start, end) => supabase.from("profiles").select("username").not("username", "is", null).order("username").range(start, end).returns<{ username: string }[]>()),
   ]);
 
-  if (posts.length + categories.length + profiles.length + 3 > 50000) throw new Error("Sitemap capacity exceeded.");
+  if (posts.length + categories.length + profiles.length + schools.length + 4 > 50000) throw new Error("Sitemap capacity exceeded.");
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: new URL(`/blog/${encodeURIComponent(post.slug)}`, SITE_URL).toString(),
     lastModified: post.updated_at && !Number.isNaN(Date.parse(post.updated_at)) ? post.updated_at : undefined,
@@ -39,9 +40,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly",
       priority: 1,
     },
-    ...["/opinions", "/videos"].map((path) => ({ url: new URL(path, SITE_URL).toString() })),
+    ...["/opinions", "/videos", "/schools"].map((path) => ({ url: new URL(path, SITE_URL).toString() })),
     ...categories.map((category) => ({ url: new URL(`/section/${encodeURIComponent(category.slug)}`, SITE_URL).toString() })),
     ...profiles.filter((profile) => profile.username).map((profile) => ({ url: new URL(`/author/${encodeURIComponent(profile.username)}`, SITE_URL).toString() })),
+    ...schools.map(school => ({ url: new URL("/schools/" + encodeURIComponent(school.slug), SITE_URL).toString() })),
     ...postEntries,
   ];
 }

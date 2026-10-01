@@ -8,6 +8,8 @@ export type Profile = {
   id: string;
   username: string | null;
   display_name: string;
+  school_id: string | null;
+  schools: { name: string; slug: string; status: string } | null;
   bio: string | null;
   avatar_url: string | null;
   role: Role;
@@ -28,7 +30,7 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, username, display_name, bio, avatar_url, role, status, created_at, updated_at')
+    .select('id, school_id, schools(name, slug, status), username, display_name, bio, avatar_url, role, status, created_at, updated_at')
     .eq('id', user.id)
     .returns<Profile[]>().single();
 

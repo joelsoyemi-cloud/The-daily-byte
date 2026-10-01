@@ -1,5 +1,6 @@
 "use client";
 
+import type { SchoolOption } from "@/lib/schools";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PostForm, { type ArticleValues } from "@/components/PostForm";
@@ -7,11 +8,13 @@ import PostForm, { type ArticleValues } from "@/components/PostForm";
 export default function EditArticleForm({
   postId,
   categories,
+  schools,
   initialValues,
   reviewerNote,
 }: {
   postId: string;
   categories: { id: string; name: string }[];
+  schools: SchoolOption[];
   initialValues: ArticleValues;
   reviewerNote: string | null;
 }) {
@@ -33,6 +36,7 @@ export default function EditArticleForm({
         title: values.title,
         slug: values.slug,
         category_id: values.category_id || null,
+        school_id: values.school_id || null,
         excerpt: values.excerpt || null,
         cover_image: values.cover_image || null,
         content: values.content,
@@ -57,6 +61,7 @@ export default function EditArticleForm({
   return (
     <PostForm
       categories={categories}
+      schools={schools}
       initialValues={initialValues}
       reviewerNote={reviewerNote}
       actions={[

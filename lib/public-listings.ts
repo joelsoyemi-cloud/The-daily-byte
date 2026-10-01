@@ -15,10 +15,11 @@ export function parsePage(value: string | string[] | undefined): number {
 
 export { siteUrl as publicUrl } from "./site";
 
-export async function getPublicStories({ page, categoryId, authorId, contentType }: {
+export async function getPublicStories({ page, categoryId, authorId, schoolId, contentType }: {
   page: number;
   categoryId?: string;
   authorId?: string;
+  schoolId?: string;
   contentType?: "video";
 }) {
   const supabase = await createClient();
@@ -26,6 +27,7 @@ export async function getPublicStories({ page, categoryId, authorId, contentType
     .select("slug, title, excerpt, cover_image, content_type, published_at, categories(name, slug)", { count: "exact" })
     .or(publicVisibility());
   if (categoryId) query = query.eq("category_id", categoryId);
+  if (schoolId) query = query.eq("school_id", schoolId);
   if (authorId) query = query.eq("author_id", authorId);
   if (contentType) query = query.eq("content_type", contentType);
   const { data, count, error } = await query
