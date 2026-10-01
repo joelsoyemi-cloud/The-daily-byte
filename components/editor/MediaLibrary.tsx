@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import EmptyState from "@/components/dashboard/EmptyState";
 
@@ -15,11 +15,7 @@ export default function MediaLibrary() {
   const [files, setFiles] = useState<FileEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  async function load() {
+  const load = useCallback(async () => {
     const { data, error } = await supabase.storage.from("media").list("", {
       limit: 100,
       sortBy: { column: "created_at", order: "desc" },
@@ -29,7 +25,9 @@ export default function MediaLibrary() {
       return;
     }
     setFiles((data as FileEntry[]) ?? []);
-  }
+  }, [supabase]);
+
+  useEffect(() => { void load(); }, [load]);
 
   async function handleDelete(name: string) {
     if (!confirm(`Delete ${name}?`)) return;

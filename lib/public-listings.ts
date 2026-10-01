@@ -13,9 +13,7 @@ export function parsePage(value: string | string[] | undefined): number {
   return Number.isSafeInteger(page) && page <= 10000 ? page : 1;
 }
 
-export function publicUrl(path: string) {
-  return new URL(path, process.env.NEXT_PUBLIC_SITE_URL || "https://the-dailybyte-nine.vercel.app").toString();
-}
+export { siteUrl as publicUrl } from "./site";
 
 export async function getPublicStories({ page, categoryId, authorId, contentType }: {
   page: number;

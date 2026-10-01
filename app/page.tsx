@@ -6,6 +6,9 @@ import LeadPlusGrid from "@/components/site/sections/LeadPlusGrid";
 import ImageGrid from "@/components/site/sections/ImageGrid";
 import Rail from "@/components/site/sections/Rail";
 import type { StoryCardPost } from "@/components/site/StoryCard";
+import { siteUrl, feedAlternate } from "@/lib/site";
+
+export const metadata = { alternates: { canonical: siteUrl("/"), types: feedAlternate } };
 
 export const revalidate = 0;
 
@@ -48,6 +51,8 @@ export default async function HomePage() {
       byCategory("tech", 8),
       byCategory("sports", 6),
     ]);
+
+  if (latest.error) throw new Error("Unable to load the latest stories.");
 
   return (
     <>

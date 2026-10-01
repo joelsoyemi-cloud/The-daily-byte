@@ -23,7 +23,7 @@ export default async function BreakingTicker() {
         </span>
 
         {posts.length === 1 ? (
-          <Link href={`/blog/${posts[0].slug}`} className="min-h-11 min-w-0 px-4 py-2.5 text-sm font-medium hover:text-white/75 motion-safe:transition-colors truncate">
+          <Link href={`/blog/${encodeURIComponent(posts[0].slug)}`} className="min-h-11 min-w-0 px-4 py-2.5 text-sm font-medium hover:text-white/75 motion-safe:transition-colors truncate">
             {posts[0].title}
           </Link>
         ) : (

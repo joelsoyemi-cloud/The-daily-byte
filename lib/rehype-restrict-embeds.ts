@@ -21,6 +21,8 @@ export function rehypeRestrictEmbeds() {
 
       if (!isAllowed && parent && typeof index === "number") {
         parent.children.splice(index, 1);
+        // Revisit this index: the next sibling shifted into the removed slot.
+        return index;
       }
     });
   };

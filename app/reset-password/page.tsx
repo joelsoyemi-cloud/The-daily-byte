@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BrandMark from "@/components/brand/BrandMark";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -9,20 +10,32 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const supabase = createClient();
   const [ready, setReady] = useState(false);
+  const [checked, setChecked] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    let active = true;
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReady(true);
     });
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
+      if (!active) return;
+      setReady(Boolean(data.session));
+      setChecked(true);
+    }).catch(() => {
+      if (active) setChecked(true);
     });
-    return () => sub.subscription.unsubscribe();
+    return () => { active = false; sub.subscription.unsubscribe(); };
   }, [supabase]);
+
+  useEffect(() => {
+    if (!done) return;
+    const timer = setTimeout(() => router.push("/login"), 2000);
+    return () => clearTimeout(timer);
+  }, [done, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,7 +50,17 @@ export default function ResetPasswordPage() {
       return;
     }
     setDone(true);
-    setTimeout(() => router.push("/login"), 2000);
+  }
+
+  if (!ready && checked) {
+    return (
+      <div className="max-w-sm mx-auto px-5 py-24 text-center">
+        <BrandMark className="mb-6 h-8 w-8 mx-auto" />
+        <h1 className="font-display font-900 text-2xl mb-3">Reset link unavailable</h1>
+        <p className="text-muted mb-5">This link may have expired. Request a new password reset link to continue.</p>
+        <Link href="/forgot-password" className="font-bold underline">Request a new link</Link>
+      </div>
+    );
   }
 
   if (!ready) {
@@ -70,10 +93,10 @@ export default function ResetPasswordPage() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+          <label htmlFor="new-password" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
             New password
           </label>
-          <input
+          <input id="new-password" autoComplete="new-password"
             type="password"
             required
             minLength={6}
@@ -83,7 +106,7 @@ export default function ResetPasswordPage() {
           />
         </div>
 
-        {error && <p className="text-brand text-sm font-medium">{error}</p>}
+        {error && <p role="alert" className="text-brand text-sm font-medium">{error}</p>}
 
         <button
           type="submit"

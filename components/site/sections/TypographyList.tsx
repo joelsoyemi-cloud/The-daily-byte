@@ -18,7 +18,7 @@ export default function TypographyList({ posts }: { posts: OpinionPost[] }) {
       {posts.map((post) => (
         <StaggerItem key={post.slug} className="min-w-0 py-6 sm:py-8 [overflow-wrap:anywhere]">
           <Link
-            href={`/blog/${post.slug}`}
+            href={`/blog/${encodeURIComponent(post.slug)}`}
             className="group block rounded-lg"
           >
             <h3 className="font-display font-bold text-xl sm:text-2xl lg:text-3xl leading-snug motion-safe:transition-colors motion-safe:duration-200 group-hover:text-brand">

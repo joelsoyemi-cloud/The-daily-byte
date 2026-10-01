@@ -12,8 +12,8 @@ export default function BreakingTickerTrack({ posts }: { posts: { slug: string; 
     <>
       <div className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain">
         <div className={`flex w-max hover:[animation-play-state:paused] focus-within:[animation:none] ${moving ? "motion-safe:animate-ticker" : ""}`}>
-          <ul className="flex shrink-0 items-center">{posts.map((post) => <li key={post.slug}><Link href={`/blog/${post.slug}`} className="inline-flex min-h-11 items-center whitespace-nowrap px-6 text-sm font-medium hover:text-white/75 motion-safe:transition-colors">{post.title}</Link></li>)}</ul>
-          {moving && <div aria-hidden="true" className="flex shrink-0 items-center motion-reduce:hidden">{posts.map((post) => <Link key={post.slug} href={`/blog/${post.slug}`} tabIndex={-1} className="inline-flex min-h-11 items-center whitespace-nowrap px-6 text-sm font-medium hover:text-white/75">{post.title}</Link>)}</div>}
+          <ul className="flex shrink-0 items-center">{posts.map((post) => <li key={post.slug}><Link href={`/blog/${encodeURIComponent(post.slug)}`} className="inline-flex min-h-11 items-center whitespace-nowrap px-6 text-sm font-medium hover:text-white/75 motion-safe:transition-colors">{post.title}</Link></li>)}</ul>
+          {moving && <div aria-hidden="true" className="flex shrink-0 items-center motion-reduce:hidden">{posts.map((post) => <Link key={post.slug} href={`/blog/${encodeURIComponent(post.slug)}`} tabIndex={-1} className="inline-flex min-h-11 items-center whitespace-nowrap px-6 text-sm font-medium hover:text-white/75">{post.title}</Link>)}</div>}
         </div>
       </div>
       {!reducedMotion && <button type="button" aria-label={paused ? "Resume breaking headlines" : "Pause breaking headlines"} aria-pressed={paused} onClick={() => setPaused((value) => !value)} className="flex h-11 w-11 shrink-0 items-center justify-center border-l border-white/20 hover:bg-white/10">

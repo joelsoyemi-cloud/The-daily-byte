@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
@@ -18,7 +19,7 @@ export type Profile = {
 const EDITOR_ROLES: Role[] = ['editor', 'admin'];
 const AUTHOR_ROLES: Role[] = ['contributor', 'author', 'editor', 'admin'];
 
-export async function getCurrentProfile(): Promise<Profile | null> {
+export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,12 +28,12 @@ export async function getCurrentProfile(): Promise<Profile | null> {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, username, display_name, bio, avatar_url, role, status, created_at, updated_at')
     .eq('id', user.id)
-    .single();
+    .returns<Profile[]>().single();
 
-  return (profile as Profile) ?? null;
-}
+  return profile ?? null;
+});
 
 export async function requireAuth(): Promise<Profile> {
   const profile = await getCurrentProfile();

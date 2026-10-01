@@ -231,7 +231,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
             {results.map((result) => {
               const time = publicationTime(result.published_at);
               return <motion.li key={result.slug} variants={{ hidden: { opacity: 0, y: reducedMotion ? 0 : 6 }, visible: { opacity: 1, y: 0 } }} transition={reducedMotion ? { duration: 0 } : softSpring}>
-                <Link href={`/blog/${result.slug}`} onClick={onClose} className="group flex min-w-0 gap-3 rounded-2xl p-3 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand motion-safe:transition-colors sm:gap-4">
+                <Link href={`/blog/${encodeURIComponent(result.slug)}`} onClick={onClose} className="group flex min-w-0 gap-3 rounded-2xl p-3 hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand motion-safe:transition-colors sm:gap-4">
                   <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface font-display text-lg font-bold text-brand sm:h-20 sm:w-20">
                     {result.cover_image ? <Image src={result.cover_image} alt="" fill sizes="(max-width: 639px) 64px, 80px" className="object-cover" /> : <span aria-hidden="true">DB</span>}
                   </div>

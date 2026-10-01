@@ -35,7 +35,7 @@ export default function StoryCard({
   const isVideo = post.content_type === 'video';
 
   return (
-    <Link href={`/blog/${post.slug}`} className="group block h-full min-w-0 rounded-3xl [overflow-wrap:anywhere]">
+    <Link href={`/blog/${encodeURIComponent(post.slug)}`} className="group block h-full min-w-0 rounded-3xl [overflow-wrap:anywhere]">
       <article className="h-full min-w-0 flex flex-col rounded-3xl overflow-hidden bg-white shadow-soft hover:shadow-soft-lg motion-safe:transition-shadow motion-safe:duration-300">
         <div className={`relative ${sizes.aspect} overflow-hidden bg-surface`}>
           {post.cover_image && !failedImage ? (

@@ -9,6 +9,7 @@ import Markdown from "@/components/Markdown";
 import { Reveal, StaggerReveal, StaggerItem } from "@/components/motion/Reveal";
 import StoryCard, { type StoryCardPost } from "@/components/site/StoryCard";
 import ArticleInteractions, { ArticleReadingProgress } from "@/components/site/ArticleInteractions";
+import { DEFAULT_SOCIAL_IMAGE, feedAlternate, siteUrl } from "@/lib/site";
 
 export const revalidate = 0;
 
@@ -20,19 +21,19 @@ const visibleFilter = () =>
 // Share one request-scoped article lookup between metadata and page rendering.
 const getPost = cache(async (slug: string): Promise<ArticlePost | null> => {
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("posts")
     .select(ARTICLE_SELECT)
     .eq("slug", slug)
     .or(visibleFilter())
     .returns<ArticlePost[]>()
-    .single();
+    .maybeSingle();
+  if (error) throw new Error("Unable to load this story.");
   return data ?? null;
 });
 
 function articleUrl(slug: string) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://the-dailybyte-nine.vercel.app";
-  return new URL(`/blog/${encodeURIComponent(slug)}`, siteUrl).toString();
+  return siteUrl(`/blog/${encodeURIComponent(slug)}`);
 }
 
 function validDate(value: string | null): string | undefined {
@@ -68,7 +69,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: url, types: feedAlternate },
     authors: author ? [{ name: author }] : undefined,
     openGraph: {
       title, description, url, siteName: "The Daily Byte", type: "article",
@@ -76,11 +77,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       modifiedTime: modified,
       authors: author ? [author] : undefined,
       section: post.categories?.name || post.category || undefined,
-      images: post.cover_image ? [post.cover_image] : undefined,
+      images: post.cover_image ? [post.cover_image] : [DEFAULT_SOCIAL_IMAGE],
     },
     twitter: {
       card: "summary_large_image", title, description,
-      images: post.cover_image ? [post.cover_image] : undefined,
+      images: post.cover_image ? [post.cover_image] : [DEFAULT_SOCIAL_IMAGE],
     },
   };
 }
@@ -145,7 +146,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     datePublished: published,
     dateModified: modified,
     articleSection: category || undefined,
-    author: author?.display_name ? { "@type": "Person", name: author.display_name } : undefined,
+    author: author?.display_name ? { "@type": "Person", name: author.display_name, url: author.username ? siteUrl(`/author/${encodeURIComponent(author.username)}`) : undefined } : undefined,
     url,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     publisher: { "@type": "Organization", name: "The Daily Byte", logo: { "@type": "ImageObject", url: new URL("/brand/logo-mark.svg", url).toString(), width: 512, height: 512 } },
@@ -159,6 +160,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           // Contributor text must never be able to close the script element.
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org", "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
+            ...(post.categories ? [{ "@type": "ListItem", position: 2, name: post.categories.name, item: siteUrl(`/section/${encodeURIComponent(post.categories.slug)}`) }] : []),
+            { "@type": "ListItem", position: post.categories ? 3 : 2, name: post.title, item: url },
+          ],
+        }).replace(/</g, "\\u003c") }} />
 
         <Reveal>
           <nav aria-label="Breadcrumb" className="text-xs text-muted sm:text-sm">

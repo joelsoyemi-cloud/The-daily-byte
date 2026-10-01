@@ -37,7 +37,7 @@ export default async function Hero() {
             {secondary.map((post) => (
               <StaggerItem key={post.slug}>
                 <Link
-                  href={`/blog/${post.slug}`}
+                  href={`/blog/${encodeURIComponent(post.slug)}`}
                   className="group flex min-w-0 gap-3 items-start rounded-xl [overflow-wrap:anywhere] sm:gap-4"
                 >
                   <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl overflow-hidden bg-surface">

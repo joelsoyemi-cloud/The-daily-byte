@@ -92,8 +92,8 @@ export default function UsersTable({
         })}
       </ul>
       <p className="text-xs text-muted mt-4">
-        You can't change your own role or status here — ask another admin if
-        that's ever needed.
+        You can&apos;t change your own role or status here — ask another admin if
+        that&apos;s ever needed.
       </p>
     </div>
   );

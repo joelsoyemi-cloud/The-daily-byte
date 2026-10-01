@@ -3,33 +3,28 @@ import Header from '@/components/site/Header';
 import Footer from '@/components/site/Footer';
 import { createClient } from '@/lib/supabase/server';
 import './globals.css';
-
-const metadataBase = new URL(
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://the-dailybyte-nine.vercel.app'
-);
-const defaultSocialImage = {
-  url: new URL('/brand/the-daily-byte-og.png', metadataBase).toString(),
-  width: 1731,
-  height: 909,
-  alt: 'The Daily Byte — news, tech, and culture',
-};
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, DEFAULT_SOCIAL_IMAGE, feedAlternate, siteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   applicationName: 'The Daily Byte',
-  metadataBase,
+  metadataBase: SITE_URL,
   title: {
     default: 'The Daily Byte — News, Tech & Entertainment',
     template: '%s | The Daily Byte',
   },
-  description: 'News, tech, and entertainment — updated daily.',
+  description: SITE_DESCRIPTION,
+  alternates: { types: feedAlternate },
   openGraph: {
     siteName: 'The Daily Byte',
+    url: siteUrl('/'),
     type: 'website',
-    images: [defaultSocialImage],
+    title: 'The Daily Byte — News, Tech & Entertainment',
+    description: SITE_DESCRIPTION,
+    images: [DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
-    images: [defaultSocialImage],
+    images: [DEFAULT_SOCIAL_IMAGE],
   },
 };
 
@@ -50,6 +45,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className="font-sans antialiased min-h-screen flex flex-col bg-paper text-ink">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org', '@graph': [
+            { '@type': 'Organization', '@id': siteUrl('/#organization'), name: SITE_NAME, url: siteUrl('/'), logo: { '@type': 'ImageObject', url: siteUrl('/brand/logo-mark.svg'), width: 512, height: 512 } },
+            { '@type': 'WebSite', '@id': siteUrl('/#website'), name: SITE_NAME, url: siteUrl('/'), publisher: { '@id': siteUrl('/#organization') } },
+          ],
+        }).replace(/</g, '\\u003c') }} />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-ink">Skip to content</a>
         <Header categories={categories ?? []} hasBreaking={(breakingCount ?? 0) > 0} />
         <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 scroll-mt-40">{children}</main>

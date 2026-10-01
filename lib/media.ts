@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { validateMediaFile } from './media-validation';
 
 /**
  * Compresses/resizes an image in the browser before upload, using canvas.
@@ -12,16 +13,17 @@ export async function compressImage(
   if (!file.type.startsWith('image/')) return file;
 
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxWidth / bitmap.width);
-  const width = Math.round(bitmap.width * scale);
-  const height = Math.round(bitmap.height * scale);
+  const scale = Math.min(1, maxWidth / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
 
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return file;
+  if (!ctx) { bitmap.close(); throw new Error('Image processing is unavailable. Please try another browser.'); }
   ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
 
   const blob: Blob | null = await new Promise((resolve) =>
     canvas.toBlob(resolve, 'image/jpeg', quality)
@@ -37,11 +39,12 @@ export async function compressImage(
  * public URL. Images are compressed first; video/other files upload as-is.
  */
 export async function uploadMedia(file: File): Promise<string> {
+  validateMediaFile(file);
   const supabase = createClient();
   const toUpload = await compressImage(file);
 
   const safeName = toUpload.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
-  const path = `${Date.now()}-${safeName}`;
+  const path = `${crypto.randomUUID()}-${safeName.slice(-120)}`;
 
   const { error } = await supabase.storage.from('media').upload(path, toUpload, {
     cacheControl: '3600',
@@ -76,5 +79,6 @@ export function videoUrlToEmbed(url: string): string | null {
 
 /** Wraps an uploaded video file's URL in an HTML5 <video> tag. */
 export function videoFileEmbed(url: string): string {
-  return `<video controls src="${url}"></video>`;
+  const escaped = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<video controls src="${escaped}"></video>`;
 }

@@ -1,18 +1,16 @@
+import { publicPageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { PAGE_SIZE, parsePage, publicUrl, publicVisibility, type ListingSearchParams } from "@/lib/public-listings";
+import { PAGE_SIZE, parsePage, publicVisibility, type ListingSearchParams } from "@/lib/public-listings";
 import TypographyList, { type OpinionPost } from "@/components/site/sections/TypographyList";
 import Pagination from "@/components/site/Pagination";
 import { ArchiveMessage } from "@/components/site/StoryArchive";
 import { Reveal } from "@/components/motion/Reveal";
 
 export const revalidate = 0;
-export const metadata: Metadata = {
-  title: "Opinions",
-  description: "Perspectives and opinion from The Daily Byte.",
-  alternates: { canonical: publicUrl("/opinions") },
-  openGraph: { title: "Opinions", url: publicUrl("/opinions"), type: "website", siteName: "The Daily Byte" },
-};
+export async function generateMetadata({ searchParams }: { searchParams: ListingSearchParams }): Promise<Metadata> {
+  return publicPageMetadata({ title: "Opinions", description: "Perspectives and opinion from The Daily Byte.", path: "/opinions", page: parsePage((await searchParams).page) });
+}
 
 export default async function OpinionsPage({ searchParams }: { searchParams: ListingSearchParams }) {
   const page = parsePage((await searchParams).page);

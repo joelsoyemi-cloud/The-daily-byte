@@ -41,7 +41,7 @@ export default async function ActivityPage() {
                 </span>
               </p>
               {a.feedback && (
-                <p className="text-sm text-muted mt-1 italic">"{a.feedback}"</p>
+                <p className="text-sm text-muted mt-1 italic">&quot;{a.feedback}&quot;</p>
               )}
               <p className="text-xs text-muted mt-1">
                 {formatDate(a.created_at)}

@@ -52,10 +52,10 @@ export default function ForgotPasswordPage() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+          <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
             Email
           </label>
-          <input
+          <input id="email" autoComplete="email"
             type="email"
             required
             value={email}
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
           />
         </div>
 
-        {error && <p className="text-brand text-sm font-medium">{error}</p>}
+        {error && <p role="alert" className="text-brand text-sm font-medium">{error}</p>}
 
         <button
           type="submit"

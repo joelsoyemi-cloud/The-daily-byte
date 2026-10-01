@@ -1,14 +1,13 @@
+import { publicPageMetadata } from "@/lib/site";
 import type { Metadata } from "next";
-import { getPublicStories, parsePage, publicUrl, type ListingSearchParams } from "@/lib/public-listings";
+import { getPublicStories, parsePage, type ListingSearchParams } from "@/lib/public-listings";
 import StoryArchive from "@/components/site/StoryArchive";
 import { Reveal } from "@/components/motion/Reveal";
 
 export const revalidate = 0;
-export const metadata: Metadata = {
-  title: "Videos", description: "Video stories from The Daily Byte.",
-  alternates: { canonical: publicUrl("/videos") },
-  openGraph: { title: "Videos", url: publicUrl("/videos"), type: "website", siteName: "The Daily Byte" },
-};
+export async function generateMetadata({ searchParams }: { searchParams: ListingSearchParams }): Promise<Metadata> {
+  return publicPageMetadata({ title: "Videos", description: "Video stories from The Daily Byte.", path: "/videos", page: parsePage((await searchParams).page) });
+}
 
 export default async function VideosPage({ searchParams }: { searchParams: ListingSearchParams }) {
   const page = parsePage((await searchParams).page);

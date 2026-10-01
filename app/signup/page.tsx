@@ -66,10 +66,10 @@ export default function SignupPage() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+          <label htmlFor="name" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
             Name
           </label>
-          <input
+          <input id="name" autoComplete="name"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -78,10 +78,10 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+          <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
             Email
           </label>
-          <input
+          <input id="email" autoComplete="email"
             type="email"
             required
             value={email}
@@ -91,10 +91,10 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
+          <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
             Password
           </label>
-          <input
+          <input id="password" autoComplete="new-password"
             type="password"
             required
             minLength={6}
@@ -104,7 +104,7 @@ export default function SignupPage() {
           />
         </div>
 
-        {error && <p className="text-brand text-sm font-medium">{error}</p>}
+        {error && <p role="alert" className="text-brand text-sm font-medium">{error}</p>}
 
         <button
           type="submit"

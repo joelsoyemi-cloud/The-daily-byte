@@ -1,3 +1,4 @@
+import "server-only";
 export async function searchCoverImage(query: string): Promise<string | null> {
   const key = process.env.UNSPLASH_ACCESS_KEY;
   if (!key) return null;

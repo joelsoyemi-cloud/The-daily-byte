@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 import BrandMark from "@/components/brand/BrandMark";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,7 +21,7 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -32,7 +33,8 @@ function LoginForm() {
     }
 
     const next = searchParams.get("next");
-    router.push(next || "/dashboard");
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+    router.push(safeRedirectPath(next, profile?.role === "reader" ? "/" : "/dashboard"));
     router.refresh();
   }
 
@@ -41,6 +43,7 @@ function LoginForm() {
       <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-8">Sign in</h1>
 
+      {searchParams.get("error") === "invalid-link" && <p role="alert" className="mb-5 text-sm text-brand">This sign-in link is invalid or has expired. Request a new link and try again.</p>}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
@@ -51,6 +54,7 @@ function LoginForm() {
           </label>
           <input
             id="email"
+            autoComplete="email"
             type="email"
             required
             value={email}
@@ -68,6 +72,7 @@ function LoginForm() {
           </label>
           <input
             id="password"
+            autoComplete="current-password"
             type="password"
             required
             value={password}
@@ -76,7 +81,7 @@ function LoginForm() {
           />
         </div>
 
-        {error && <p className="text-brand text-sm font-medium">{error}</p>}
+        {error && <p role="alert" className="text-brand text-sm font-medium">{error}</p>}
 
         <button
           type="submit"

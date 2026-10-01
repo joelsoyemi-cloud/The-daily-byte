@@ -4,9 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getPublicStories, parsePage, publicUrl, type ListingSearchParams } from "@/lib/public-listings";
+import { getPublicStories, parsePage, type ListingSearchParams } from "@/lib/public-listings";
 import StoryArchive from "@/components/site/StoryArchive";
 import { Reveal } from "@/components/motion/Reveal";
+import { publicPageMetadata } from "@/lib/site";
 
 export const revalidate = 0;
 type PublicProfile = { id: string; username: string; display_name: string; bio: string | null; avatar_url: string | null };
@@ -17,11 +18,10 @@ const getProfile = cache(async (username: string) => {
   return data;
 });
 
-export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ username: string }>; searchParams: ListingSearchParams }): Promise<Metadata> {
   const profile = await getProfile((await params).username);
   if (!profile) return {};
-  const url = publicUrl(`/author/${encodeURIComponent(profile.username)}`);
-  return { title: profile.display_name || profile.username, description: profile.bio || undefined, alternates: { canonical: url }, openGraph: { title: profile.display_name || profile.username, description: profile.bio || undefined, url, type: "profile", siteName: "The Daily Byte" } };
+  return publicPageMetadata({ title: profile.display_name || profile.username, description: profile.bio || undefined, path: `/author/${encodeURIComponent(profile.username)}`, page: parsePage((await searchParams).page), profile: true });
 }
 
 export default async function AuthorPage({ params, searchParams }: { params: Promise<{ username: string }>; searchParams: ListingSearchParams }) {

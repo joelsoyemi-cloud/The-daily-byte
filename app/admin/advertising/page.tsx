@@ -27,7 +27,7 @@ export default async function AdvertisingPage() {
 
       <p className="text-xs text-muted mt-4">
         No revenue or impression data is shown here that requires wiring up
-        AdSense's own reporting API separately, which hasn't been built. This
+        AdSense&apos;s own reporting API separately, which hasn&apos;t been built. This
         page only reflects real configuration state.
       </p>
     </div>

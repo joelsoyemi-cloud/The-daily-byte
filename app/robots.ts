@@ -1,17 +1,9 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://the-dailybyte-nine.vercel.app";
+import { siteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: ["/admin", "/api"],
-      },
-    ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/editor", "/dashboard", "/login", "/signup", "/forgot-password", "/reset-password", "/unauthorized", "/auth", "/api"] }],
+    sitemap: siteUrl("/sitemap.xml"),
   };
 }

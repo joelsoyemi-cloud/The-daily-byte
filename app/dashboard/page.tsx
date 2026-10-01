@@ -36,7 +36,7 @@ export default async function DashboardOverview() {
         Welcome back, {profile.display_name}
       </h1>
       <p className="text-muted text-sm mb-8">
-        Here's where your articles stand.
+        Here&apos;s where your articles stand.
       </p>
 
       {total === 0 ? (

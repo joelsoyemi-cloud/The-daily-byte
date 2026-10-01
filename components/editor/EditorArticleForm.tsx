@@ -193,7 +193,7 @@ export default function EditorArticleForm({
             )}
           </div>
           <p className="text-xs text-muted mt-2">
-            Won't appear on the public site until this exact time enforced by
+            Won&apos;t appear on the public site until this exact time enforced by
             the database, not the app remembering to check.
           </p>
         </div>

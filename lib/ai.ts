@@ -1,3 +1,5 @@
+import "server-only";
+import { safeHeadlineSource } from "./source-url";
 function stripHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
@@ -10,8 +12,11 @@ function stripHtml(html: string): string {
 }
 
 async function fetchSourceText(url: string): Promise<string> {
+  const source = safeHeadlineSource(url);
+  if (!source) return "";
   try {
-    const res = await fetch(url, {
+    const res = await fetch(source, {
+      redirect: "error",
       headers: { "User-Agent": "Mozilla/5.0 (compatible; DailyByteBot/1.0)" },
       signal: AbortSignal.timeout(8000),
     });

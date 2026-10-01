@@ -36,7 +36,7 @@ export default async function RolesPage() {
       <h1 className="font-display font-900 text-2xl mb-2">Roles</h1>
       <p className="text-muted text-sm mb-6">
         What each role can actually do — enforced at the database level, not
-        just hidden in the UI. To change someone's role, go to Users.
+        just hidden in the UI. To change someone&apos;s role, go to Users.
       </p>
 
       <ul className="divide-y divide-line border-t border-line">
