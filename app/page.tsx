@@ -56,7 +56,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <h1 className="sr-only">The Daily Byte: news, tech, and culture</h1>
       <BreakingTicker />
       <Hero />
 
