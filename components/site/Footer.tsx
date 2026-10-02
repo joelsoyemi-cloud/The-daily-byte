@@ -11,7 +11,7 @@ export default function Footer({ categories }: { categories: { name: string; slu
         <Reveal>
           <div className="grid min-w-0 gap-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1.5fr] lg:gap-12">
             <div className="min-w-0">
-              <Link href="/" className="inline-flex min-h-11 items-center rounded-md font-display text-2xl font-black tracking-tight"><BrandLogo /></Link>
+              <Link href="/" className="inline-flex min-h-11 items-center rounded-md text-3xl"><BrandLogo /></Link>
               <p className="mt-3 max-w-sm text-sm leading-7 text-muted">News, tech, and culture. Fresh perspectives and stories worth making time for.</p>
               <p className="mt-6 font-display text-lg font-bold">Stay in the loop.</p>
               <p className="mt-2 text-sm leading-relaxed text-muted">Make The Daily Byte part of your daily reading.</p>

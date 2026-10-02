@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
+import BrandLogo from "@/components/brand/BrandLogo";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
@@ -174,7 +175,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
         <div className="shrink-0 border-b border-line p-4 sm:p-6">
           <div className="mb-5 flex items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand">The Daily Byte</p>
+              <BrandLogo className="text-xl" />
               <h2 id={titleId} className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-3xl">Find your next read.</h2>
             </div>
             <button type="button" onClick={onClose} aria-label="Close search" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface hover:bg-brand/10 hover:text-brand motion-safe:transition-colors">

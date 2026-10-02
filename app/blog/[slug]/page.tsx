@@ -1,5 +1,6 @@
 import { cache } from "react";
 import Avatar from "@/components/Avatar";
+import BrandLogo from "@/components/brand/BrandLogo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -244,7 +245,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <Reveal className="mt-14 sm:mt-20">
         <aside aria-labelledby="stay-in-the-loop" className="relative overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-soft sm:p-10 lg:p-12">
           <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-brand" />
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand">The Daily Byte</p>
+          <BrandLogo className="text-xl" />
           <h2 id="stay-in-the-loop" className="mt-3 font-display text-3xl font-black tracking-tight sm:text-4xl">Stay in the loop.</h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted sm:text-lg">Fresh perspectives on news, tech, and culture. Make The Daily Byte part of your daily reading.</p>
           <Link href="/" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white hover:bg-brand motion-safe:transition-colors">Explore the latest <span aria-hidden="true" className="ml-2">&rarr;</span></Link>

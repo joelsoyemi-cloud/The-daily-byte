@@ -15,6 +15,7 @@ const config: Config = {
         surface: '#F7F7F7',
       },
       fontFamily: {
+        brand: ['Georgia', 'Times New Roman', 'serif'],
         display: ['Archivo', 'system-ui', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },

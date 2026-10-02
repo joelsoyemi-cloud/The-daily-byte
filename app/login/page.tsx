@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import BrandMark from "@/components/brand/BrandMark";
+import BrandLogo from "@/components/brand/BrandLogo";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -41,7 +42,10 @@ function LoginForm() {
 
   return (
     <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere]">
-      <BrandMark className="mb-6 h-8 w-8" />
+      <Link href="/" aria-label="The Daily Byte home" className="mb-6 inline-flex min-h-11 items-center gap-3 rounded-md">
+        <BrandMark decorative className="h-8 w-8" />
+        <BrandLogo className="text-2xl" />
+      </Link>
       <h1 className="font-display font-900 text-2xl mb-8">Sign in</h1>
 
       {searchParams.get("error") === "invalid-link" && <p role="alert" className="mb-5 text-sm text-brand">This sign-in link is invalid or has expired. Request a new link and try again.</p>}

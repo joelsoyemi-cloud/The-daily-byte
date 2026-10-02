@@ -77,7 +77,7 @@ export default function Header({
 
         <div className="relative max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-x-2 gap-y-3 sm:gap-x-4">
           <motion.div style={{ scale: shouldReduceMotion ? 1 : logoScale }} className="shrink-0 origin-left">
-            <Link href="/" className="inline-flex min-h-11 items-center whitespace-nowrap font-display font-black text-lg tracking-tight sm:text-2xl">
+            <Link href="/" className="inline-flex min-h-11 items-center whitespace-nowrap text-2xl sm:text-3xl">
               <BrandLogo />
             </Link>
           </motion.div>

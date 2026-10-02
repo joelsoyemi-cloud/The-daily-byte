@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import BrandMark from "@/components/brand/BrandMark";
+import BrandLogo from "@/components/brand/BrandLogo";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BetaNotice from "@/components/site/BetaNotice";
@@ -56,7 +57,10 @@ export default function SignupPage() {
   if (submitted) {
     return (
       <div className="max-w-sm mx-auto px-5 py-24 text-center [overflow-wrap:anywhere]">
-        <BrandMark className="mb-6 h-8 w-8 mx-auto" />
+        <Link href="/" aria-label="The Daily Byte home" className="mb-6 inline-flex min-h-11 items-center gap-3 rounded-md">
+          <BrandMark decorative className="h-8 w-8" />
+          <BrandLogo className="text-2xl" />
+        </Link>
         <h1 className="font-display font-900 text-2xl mb-3">
           Check your email
         </h1>
@@ -72,7 +76,10 @@ export default function SignupPage() {
 
   return (
     <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere]">
-      <BrandMark className="mb-6 h-8 w-8" />
+      <Link href="/" aria-label="The Daily Byte home" className="mb-6 inline-flex min-h-11 items-center gap-3 rounded-md">
+        <BrandMark decorative className="h-8 w-8" />
+        <BrandLogo className="text-2xl" />
+      </Link>
       <h1 className="font-display font-900 text-2xl mb-2">
         Become a contributor
       </h1>
