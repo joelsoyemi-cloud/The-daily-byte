@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     collect((start, end) => supabase.from("profiles").select("username").not("username", "is", null).order("username").range(start, end).returns<{ username: string }[]>()),
   ]);
 
-  if (posts.length + categories.length + profiles.length + schools.length + 4 > 50000) throw new Error("Sitemap capacity exceeded.");
+  if (posts.length + categories.length + profiles.length + schools.length + 5 > 50000) throw new Error("Sitemap capacity exceeded.");
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: new URL(`/blog/${encodeURIComponent(post.slug)}`, SITE_URL).toString(),
     lastModified: post.updated_at && !Number.isNaN(Date.parse(post.updated_at)) ? post.updated_at : undefined,
@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly",
       priority: 1,
     },
-    ...["/opinions", "/videos", "/schools"].map((path) => ({ url: new URL(path, SITE_URL).toString() })),
+    ...["/opinions", "/videos", "/schools", "/write"].map((path) => ({ url: new URL(path, SITE_URL).toString() })),
     ...categories.map((category) => ({ url: new URL(`/section/${encodeURIComponent(category.slug)}`, SITE_URL).toString() })),
     ...profiles.filter((profile) => profile.username).map((profile) => ({ url: new URL(`/author/${encodeURIComponent(profile.username)}`, SITE_URL).toString() })),
     ...schools.map(school => ({ url: new URL("/schools/" + encodeURIComponent(school.slug), SITE_URL).toString() })),

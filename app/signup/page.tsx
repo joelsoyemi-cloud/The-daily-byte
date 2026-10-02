@@ -3,9 +3,12 @@
 import { useState } from "react";
 import BrandMark from "@/components/brand/BrandMark";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import BetaNotice from "@/components/site/BetaNotice";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,7 +22,8 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signUp({
+    try {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -35,26 +39,37 @@ export default function SignupPage() {
       return;
     }
 
-    setSubmitted(true);
+    if (data.session) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      setSubmitted(true);
+    }
+    } catch {
+      setError("Unable to create your account right now. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {
     return (
-      <div className="max-w-sm mx-auto px-5 py-24 text-center">
+      <div className="max-w-sm mx-auto px-5 py-24 text-center [overflow-wrap:anywhere]">
         <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         <h1 className="font-display font-900 text-2xl mb-3">
           Check your email
         </h1>
         <p className="text-muted">
-          We sent a confirmation link to <strong>{email}</strong>. Click it to
-          activate your account, then come back and sign in.
+          If your signup is eligible, a confirmation link will arrive at <strong>{email}</strong>. Follow it to
+          activate your account, then sign in. Check your spam folder too.
         </p>
+        <Link href="/login" className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand hover:underline">Continue to sign in</Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-sm mx-auto px-5 py-24">
+    <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere]">
       <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-2">
         Become a contributor
@@ -64,7 +79,8 @@ export default function SignupPage() {
         live.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="mb-6"><BetaNotice /></div>
+      <form onSubmit={handleSubmit} className="space-y-5" aria-busy={loading}>
         <div>
           <label htmlFor="name" className="block text-xs font-bold uppercase tracking-wide text-muted mb-1.5">
             Name
@@ -73,7 +89,7 @@ export default function SignupPage() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
           />
         </div>
 
@@ -86,7 +102,7 @@ export default function SignupPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
           />
         </div>
 
@@ -100,7 +116,7 @@ export default function SignupPage() {
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
           />
         </div>
 
@@ -109,7 +125,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
+          className="min-h-11 w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
         >
           {loading ? "Creating account…" : "Create account"}
         </button>
@@ -117,7 +133,7 @@ export default function SignupPage() {
 
       <p className="mt-6 text-center text-xs font-medium text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="text-brand hover:underline">
+        <Link href="/login" className="inline-flex min-h-11 items-center text-brand hover:underline">
           Sign in
         </Link>
       </p>

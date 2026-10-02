@@ -1,3 +1,4 @@
+import BetaNotice from "@/components/site/BetaNotice";
 import Link from "next/link";
 import { requireContributor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -16,6 +17,8 @@ export default async function DashboardOverview() {
   if (recent.error) throw new Error("Unable to load your stories.");
   const changes = counts.find(row => row.status === "changes_requested")?.value;
   return <div><PageHeading eyebrow="Your byline starts here" title={"Welcome back, " + (profile.display_name || "writer") + "."} description="A place for your next idea. Keep writing, follow your submissions, and take your stories to publication." />
+    <div className="mb-6"><BetaNotice /></div>
+    <section className="nr-callout"><h2>Build your byline</h2><p>Add a short bio and optional school, create a draft, then submit it for editorial review. Only the editorial team publishes stories.</p><div className="flex flex-wrap gap-4"><Link href="/dashboard/profile" className="nr-text-link">Set up your profile</Link><Link href="/dashboard/articles/new" className="nr-text-link">Start a story</Link></div></section>
     {profile.schools?.status === "active" && <p className="mb-6 text-sm text-muted">Your school: <Link href={"/schools/" + encodeURIComponent(profile.schools.slug)} className="inline-flex min-h-11 items-center font-semibold text-accent hover:underline">{profile.schools.name}</Link> <Link href="/dashboard/profile" className="inline-flex min-h-11 items-center underline">Change affiliation</Link></p>}
     {!!changes && <section className="nr-callout"><h2>{changes} {changes === 1 ? "story needs" : "stories need"} your attention</h2><p>Your editor has requested changes. Open the feedback and get your story ready for another look.</p><Link href="/dashboard/articles?status=changes_requested" className="nr-text-link">Review requested changes →</Link></section>}
     <div className="nr-metrics">{counts.filter(row => ["draft", "submitted", "changes_requested", "published"].includes(row.status)).map(row => <Metric key={row.status} label={statusLabel(row.status)} value={row.value} href={"/dashboard/articles?status=" + row.status} tone={row.status === "changes_requested" ? "gold" : row.status === "published" ? "teal" : row.status === "draft" ? "red" : "ink"} />)}</div>

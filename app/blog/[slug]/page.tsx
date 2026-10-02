@@ -8,7 +8,8 @@ import { estimateReadMinutes, type ArticlePost } from "@/lib/posts";
 import Markdown from "@/components/Markdown";
 import { Reveal, StaggerReveal, StaggerItem } from "@/components/motion/Reveal";
 import StoryCard, { type StoryCardPost } from "@/components/site/StoryCard";
-import ArticleInteractions, { ArticleReadingProgress } from "@/components/site/ArticleInteractions";
+import { ArticleReadingProgress } from "@/components/site/ArticleInteractions";
+import ShareActions from "@/components/site/ShareActions";
 import { DEFAULT_SOCIAL_IMAGE, feedAlternate, siteUrl } from "@/lib/site";
 
 export const revalidate = 0;
@@ -201,7 +202,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   {estimateReadMinutes(post.content)} min read
                 </span>
               </div>
-              <div className="mt-6"><ArticleInteractions key={post.id} title={post.title} url={url} /></div>
+              <div className="mt-6"><ShareActions key={post.id} title={post.title} url={url} excerpt={post.excerpt} /></div>
             </StaggerItem>
           </StaggerReveal>
         </header>

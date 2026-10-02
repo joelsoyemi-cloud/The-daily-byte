@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { requireContributor } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/posts';
+import ShareActions from '@/components/site/ShareActions';
+import { siteUrl } from '@/lib/site';
 import Markdown from '@/components/Markdown';
 
 export const revalidate = 0;
@@ -34,7 +36,7 @@ export default async function ArticleViewPage({ params }: { params: Promise<{ id
   const editable = ['draft', 'changes_requested'].includes(post.status);
 
   return (
-    <div className="max-w-3xl mx-auto px-5 py-10">
+    <div className="max-w-3xl mx-auto px-5 py-10 [overflow-wrap:anywhere]">
       <Link href="/dashboard/articles" className="text-xs text-muted hover:text-brand font-medium">
         &larr; Back to My Articles
       </Link>
@@ -60,6 +62,8 @@ export default async function ArticleViewPage({ params }: { params: Promise<{ id
           Edit this article
         </Link>
       )}
+
+      {post.status === "published" && <section className="mb-8 rounded-2xl border border-line p-5"><h2 className="mb-4 font-display text-xl font-bold">Share your published story</h2><ShareActions title={post.title} url={siteUrl("/blog/" + encodeURIComponent(post.slug))} excerpt={post.excerpt} /></section>}
 
       <h2 className="font-display font-700 text-lg mb-3">Editorial history</h2>
       {!history || history.length === 0 ? (

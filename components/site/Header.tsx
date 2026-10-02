@@ -135,7 +135,7 @@ export default function Header({
             </button>
 
             <Link
-              href={role ? dashboardHref : '/signup'}
+              href={role ? dashboardHref : '/write'}
               className="hidden sm:inline-flex min-h-11 items-center whitespace-nowrap px-4 py-2 rounded-full bg-ink text-white text-sm font-semibold hover:bg-brand motion-safe:transition-colors"
             >
               {role ? 'Dashboard' : 'Write for us'}
@@ -157,7 +157,7 @@ export default function Header({
       </motion.header>
 
       <AnimatePresence>
-        {menuOpen && <MobileMenu items={navItems} pathname={pathname} dashboardHref={role ? dashboardHref : '/signup'} dashboardLabel={role ? 'Dashboard' : 'Write for us'} onClose={closeMenu} />}
+        {menuOpen && <MobileMenu items={navItems} pathname={pathname} dashboardHref={role ? dashboardHref : '/write'} dashboardLabel={role ? 'Dashboard' : 'Write for us'} onClose={closeMenu} />}
       </AnimatePresence>
 
       <AnimatePresence>
