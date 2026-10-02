@@ -39,7 +39,11 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
 
 export async function requireAuth(): Promise<Profile> {
   const profile = await getCurrentProfile();
-  if (!profile) redirect('/login');
+  if (!profile) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    redirect(user ? '/unauthorized?reason=profile' : '/login');
+  }
   if (profile.status !== 'active') redirect('/unauthorized?reason=suspended');
   return profile;
 }

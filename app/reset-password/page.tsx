@@ -42,6 +42,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError(null);
 
+    try {
     const { error } = await supabase.auth.updateUser({ password });
 
     setLoading(false);
@@ -50,22 +51,24 @@ export default function ResetPasswordPage() {
       return;
     }
     setDone(true);
+    } catch { setError("Your password could not be updated. Check your connection or request a new reset link."); }
+    finally { setLoading(false); }
   }
 
   if (!ready && checked) {
     return (
-      <div className="max-w-sm mx-auto px-5 py-24 text-center">
+      <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere] text-center">
         <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         <h1 className="font-display font-900 text-2xl mb-3">Reset link unavailable</h1>
         <p className="text-muted mb-5">This link may have expired. Request a new password reset link to continue.</p>
-        <Link href="/forgot-password" className="font-bold underline">Request a new link</Link>
+        <Link href="/forgot-password" className="inline-flex min-h-11 items-center font-bold underline">Request a new link</Link>
       </div>
     );
   }
 
   if (!ready) {
     return (
-      <div className="max-w-sm mx-auto px-5 py-24 text-center text-muted">
+      <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere] text-center text-muted">
         <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         Verifying your reset link…
       </div>
@@ -74,7 +77,7 @@ export default function ResetPasswordPage() {
 
   if (done) {
     return (
-      <div className="max-w-sm mx-auto px-5 py-24 text-center">
+      <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere] text-center">
         <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         <h1 className="font-display font-900 text-2xl mb-3">
           Password updated
@@ -85,7 +88,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto px-5 py-24">
+    <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere]">
       <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-8">
         Set a new password
@@ -102,7 +105,7 @@ export default function ResetPasswordPage() {
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 
@@ -111,7 +114,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
+          className="min-h-11 w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
         >
           {loading ? "Updating…" : "Update password"}
         </button>

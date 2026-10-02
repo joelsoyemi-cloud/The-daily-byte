@@ -16,6 +16,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError(null);
 
+    try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -26,11 +27,13 @@ export default function ForgotPasswordPage() {
       return;
     }
     setSent(true);
+    } catch { setError("A reset link could not be requested. Check your connection and try again."); }
+    finally { setLoading(false); }
   }
 
   if (sent) {
     return (
-      <div className="max-w-sm mx-auto px-5 py-24 text-center">
+      <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere] text-center">
         <BrandMark className="mb-6 h-8 w-8 mx-auto" />
         <h1 className="font-display font-900 text-2xl mb-3">
           Check your email
@@ -44,7 +47,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto px-5 py-24">
+    <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere]">
       <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-8">
         Reset your password
@@ -60,7 +63,7 @@ export default function ForgotPasswordPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 
@@ -69,7 +72,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
+          className="min-h-11 w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
         >
           {loading ? "Sending…" : "Send reset link"}
         </button>

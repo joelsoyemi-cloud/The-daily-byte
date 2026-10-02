@@ -6,6 +6,7 @@ import BrandMark from "@/components/brand/BrandMark";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import ConfirmationResend from "@/components/ConfirmationResend";
 
 function LoginForm() {
   const router = useRouter();
@@ -39,11 +40,13 @@ function LoginForm() {
   }
 
   return (
-    <div className="max-w-sm mx-auto px-5 py-24">
+    <div className="max-w-sm mx-auto px-5 py-24 [overflow-wrap:anywhere]">
       <BrandMark className="mb-6 h-8 w-8" />
       <h1 className="font-display font-900 text-2xl mb-8">Sign in</h1>
 
       {searchParams.get("error") === "invalid-link" && <p role="alert" className="mb-5 text-sm text-brand">This sign-in link is invalid or has expired. Request a new link and try again.</p>}
+      {searchParams.get("error") === "invalid-link" && <p className="mb-5 text-sm text-muted">For a password reset, use <Link href="/forgot-password" className="inline-flex min-h-11 items-center underline">Request a new reset link</Link>. If you were confirming signup, try signing in first or use <Link href="/feedback" className="inline-flex min-h-11 items-center underline">Send feedback</Link> for help.</p>}
+      {searchParams.get("error") === "invalid-link" && <ConfirmationResend />}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
@@ -59,7 +62,7 @@ function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 
@@ -77,7 +80,7 @@ function LoginForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 
@@ -86,7 +89,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
+          className="min-h-11 w-full bg-ink text-white px-4 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-brand transition-colors disabled:opacity-50"
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>

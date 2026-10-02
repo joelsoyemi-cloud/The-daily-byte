@@ -4,6 +4,7 @@ import type { SchoolOption } from "@/lib/schools";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PostForm, { type ArticleValues } from "@/components/PostForm";
+import { storySaveError } from "@/lib/student-errors";
 
 export default function NewArticleForm({
   categories,
@@ -25,7 +26,7 @@ export default function NewArticleForm({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not signed in.");
+    if (!user) throw new Error("Your session has expired. Sign in again in another tab, then retry. Keep this page open to preserve your writing.");
 
     const { data: post, error } = await supabase
       .from("posts")
@@ -47,7 +48,7 @@ export default function NewArticleForm({
       .select("id")
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error || !post) throw new Error(storySaveError(error));
 
     if (status === "submitted") {
       await supabase.from("review_history").insert({

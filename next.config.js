@@ -5,6 +5,7 @@ const imageHosts = ['images.unsplash.com', ...(process.env.IMAGE_HOSTS || '').sp
 const nextConfig = {
   outputFileTracingRoot: __dirname,
   poweredByHeader: false,
+  experimental: { serverActions: { bodySizeLimit: '3mb' } },
   images: {
     remotePatterns: [
       ...imageHosts.map(hostname => ({ protocol: 'https', hostname })),
@@ -18,7 +19,7 @@ const nextConfig = {
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
       ] },
-      ...['admin', 'editor', 'dashboard', 'login', 'signup', 'forgot-password', 'reset-password', 'unauthorized', 'auth', 'api'].map(route => ({
+      ...['admin', 'editor', 'dashboard', 'login', 'signup', 'forgot-password', 'reset-password', 'unauthorized', 'feedback', 'auth', 'api'].map(route => ({
         source: '/' + route + '/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       })),

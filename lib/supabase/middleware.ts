@@ -39,7 +39,8 @@ export async function updateSession(request: NextRequest) {
   // Password recovery must remain reachable with a recovery session.
   if (user && (match || AUTH_PAGES.includes(path))) {
     const { data: profile } = await supabase.from('profiles').select('role, status').eq('id', user.id).single();
-    if (!profile || profile.status !== 'active' || (match && !match.roles.includes(profile.role))) {
+    if (!profile) return redirectTo('/unauthorized?reason=profile');
+    if (profile.status !== 'active' || (match && !match.roles.includes(profile.role))) {
       return redirectTo('/unauthorized');
     }
     if (AUTH_PAGES.includes(path)) {

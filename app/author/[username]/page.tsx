@@ -1,5 +1,5 @@
 import { cache } from "react";
-import Image from "next/image";
+import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -29,15 +29,12 @@ export default async function AuthorPage({ params, searchParams }: { params: Pro
   if (!profile) notFound();
   const page = parsePage((await searchParams).page);
   const listing = await getPublicStories({ page, authorId: profile.id });
-  const initials = (profile.display_name || profile.username).trim().split(/\s+/).slice(0, 2).map((name) => name[0]).join("");
   const path = `/author/${encodeURIComponent(profile.username)}`;
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       <nav aria-label="Breadcrumb" className="mb-6"><ol className="flex flex-wrap items-center gap-2 text-sm text-muted"><li><Link href="/" className="inline-flex min-h-11 items-center hover:text-brand">Home</Link></li><li aria-hidden="true">/</li><li aria-current="page" className="[overflow-wrap:anywhere]">{profile.display_name || profile.username}</li></ol></nav>
       <Reveal><header className="mb-12 flex flex-col gap-6 rounded-3xl border border-line bg-surface p-6 shadow-soft sm:flex-row sm:items-start sm:p-10">
-        <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-3xl bg-brand/10 font-display text-3xl font-bold text-brand sm:h-28 sm:w-28">
-          {profile.avatar_url ? <Image src={profile.avatar_url} alt="" fill sizes="(max-width: 639px) 96px, 112px" className="object-cover" /> : <span aria-hidden="true">{initials}</span>}
-        </div>
+        <Avatar url={profile.avatar_url} name={profile.display_name || profile.username} size={96} />
         <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand">Behind the stories</p>
           <h1 className="mt-3 font-display text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">{profile.display_name || profile.username}</h1>

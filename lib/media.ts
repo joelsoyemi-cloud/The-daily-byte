@@ -41,7 +41,9 @@ export async function compressImage(
 export async function uploadMedia(file: File): Promise<string> {
   validateMediaFile(file);
   const supabase = createClient();
-  const toUpload = await compressImage(file);
+  let toUpload: File;
+  try { toUpload = await compressImage(file); }
+  catch { throw new Error("This image could not be opened. Choose another picture or try another browser."); }
 
   const safeName = toUpload.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
   const path = `${crypto.randomUUID()}-${safeName.slice(-120)}`;
@@ -51,7 +53,7 @@ export async function uploadMedia(file: File): Promise<string> {
     upsert: false,
   });
 
-  if (error) throw error;
+  if (error) throw new Error("Your file could not be uploaded. Check your connection and sign-in, then try again. Your story is still here.");
 
   const { data } = supabase.storage.from('media').getPublicUrl(path);
   return data.publicUrl;

@@ -201,6 +201,7 @@ export default function PostForm({
   }
 
   async function runAction(action: ArticleAction) {
+    if (!title.trim() || !content.trim()) { setError("Add a title and story text before saving or submitting."); return; }
     setRunningAction(action.label);
     setError(null);
     try {
@@ -223,7 +224,7 @@ export default function PostForm({
         breaking,
       });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error && !/fetch|network/i.test(err.message) ? err.message : "Your story could not be saved. Your writing is still here. Check your connection and try again.");
     } finally {
       setRunningAction(null);
     }

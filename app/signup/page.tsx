@@ -5,6 +5,7 @@ import BrandMark from "@/components/brand/BrandMark";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BetaNotice from "@/components/site/BetaNotice";
+import ConfirmationResend from "@/components/ConfirmationResend";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
@@ -64,6 +65,7 @@ export default function SignupPage() {
           activate your account, then sign in. Check your spam folder too.
         </p>
         <Link href="/login" className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand hover:underline">Continue to sign in</Link>
+        <ConfirmationResend initialEmail={email} />
       </div>
     );
   }
@@ -89,7 +91,7 @@ export default function SignupPage() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 
@@ -102,7 +104,7 @@ export default function SignupPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 
@@ -116,7 +118,7 @@ export default function SignupPage() {
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-sm"
+            className="min-h-11 w-full border-2 border-line focus:border-ink px-3 py-2 bg-white text-base"
           />
         </div>
 

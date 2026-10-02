@@ -5,6 +5,6 @@ export default function SchoolSelect({ id, value, onChange, schools }: { id: str
       <option value="">None / General stories</option>
       {value && !schools.some(s => s.id === value) && <option value={value}>Previously selected school (unavailable)</option>}
       {schools.map(school => <option key={school.id} value={school.id}>{school.name}</option>)}
-    </select><p id={id + "-note"} className="mt-2 text-xs leading-relaxed text-muted">Choose an existing school, or leave this empty. An association does not imply school endorsement.</p>
+    </select><p id={id + "-note"} className="mt-2 text-xs leading-relaxed text-muted">{schools.length ? "Choose your school, such as Olabisi Onabanjo University (OOU), or leave this empty." : "No active schools are available right now. You can leave this empty and keep writing."} An association does not imply school endorsement.</p>
   </div>;
 }

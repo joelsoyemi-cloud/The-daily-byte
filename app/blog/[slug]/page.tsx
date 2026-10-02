@@ -1,4 +1,5 @@
 import { cache } from "react";
+import Avatar from "@/components/Avatar";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -137,7 +138,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const author = post.profiles;
   const { published, modified } = articleDates(post);
   const tags = [...new Set((post.tags ?? []).map((tag) => tag.trim()).filter(Boolean))];
-  const initials = author?.display_name.trim().split(/\s+/).slice(0, 2).map((name) => name[0]).join("") || "DB";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -225,9 +225,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {author && <Reveal className="mt-10 sm:mt-12">
             <section aria-labelledby="article-author" className="rounded-3xl border border-line bg-surface p-5 sm:p-7">
               <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
-                <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-brand/10 font-display text-xl font-bold text-brand">
-                  {author.avatar_url ? <Image src={author.avatar_url} alt="" fill sizes="64px" className="object-cover" /> : <span aria-hidden="true">{initials}</span>}
-                </div>
+                <Avatar url={author.avatar_url} name={author.display_name || "Author"} size={64} />
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-widest text-muted">About the author</p>
                   <h2 id="article-author" className="mt-2 font-display text-xl font-bold [overflow-wrap:anywhere]">{author.username ? <Link href={`/author/${encodeURIComponent(author.username)}`} className="inline-block rounded-lg underline-offset-4 hover:text-brand hover:underline motion-safe:transition-colors">{author.display_name || author.username}</Link> : author.display_name || "Author"}</h2>

@@ -2,13 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Avatar from "@/components/Avatar";
 import BrandLogo from "@/components/brand/BrandLogo";
 import SignOutButton from "@/components/SignOutButton";
 import type { Role } from "@/lib/auth";
 import { workspaceLinks, WORKSPACE_LABELS, type Workspace } from "@/lib/workspaces";
 import type { NavItem } from "./DashboardShell";
 import { RoleBadge } from "./WorkspaceUI";
-export default function DashboardNavigation({ role, displayName, workspace, nav }: { role: Role; displayName: string; workspace: Workspace; nav: NavItem[] }) {
+export default function DashboardNavigation({ role, displayName, avatarUrl, workspace, nav }: { role: Role; displayName: string; avatarUrl?: string | null; workspace: Workspace; nav: NavItem[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -34,8 +35,8 @@ export default function DashboardNavigation({ role, displayName, workspace, nav 
     <details className="nr-switcher"><summary>Switch workspace <span aria-hidden="true">⌄</span></summary><nav aria-label="Switch workspace">{links.map(link => <Link key={link.id} href={link.href} onClick={() => setOpen(false)} aria-current={link.id === workspace ? "true" : undefined}>{link.label}{link.id === workspace && <span className="sr-only"> (current workspace)</span>}<span aria-hidden="true">{link.id === workspace ? "•" : "↗"}</span></Link>)}</nav></details>
     <Link href="/dashboard/articles/new" className="nr-button nr-button-primary nr-sidebar-create" onClick={() => setOpen(false)}>+ Create Story</Link>
     <nav aria-label={WORKSPACE_LABELS[workspace] + " navigation"} className="nr-navigation">{nav.map((item, index) => <Link key={item.href} href={item.href} aria-current={activeHref === item.href ? "page" : undefined} onClick={() => setOpen(false)}><span aria-hidden="true" className="nr-nav-index">{String(index + 1).padStart(2, "0")}</span>{item.label}</Link>)}</nav>
-    <div className="nr-sidebar-profile"><span className="nr-avatar-initial" aria-hidden="true">{displayName?.trim().charAt(0).toUpperCase() || "DB"}</span><div className="min-w-0"><Link href="/dashboard/profile" onClick={() => setOpen(false)} className="font-semibold break-words">{displayName || "Your profile"}</Link><p className="text-xs text-muted mt-1">Your newsroom profile</p></div></div>
-    <div className="nr-sidebar-bottom"><Link href="/" onClick={() => setOpen(false)}>Public Site ↗</Link><SignOutButton /></div></>;
+    <div className="nr-sidebar-profile"><Avatar url={avatarUrl ?? null} name={displayName} size={40} /><div className="min-w-0"><Link href="/dashboard/profile" onClick={() => setOpen(false)} className="font-semibold break-words">{displayName || "Your profile"}</Link><p className="text-xs text-muted mt-1">Your newsroom profile</p></div></div>
+    <div className="nr-sidebar-bottom"><Link href="/feedback" onClick={() => setOpen(false)}>Send feedback</Link><Link href="/" onClick={() => setOpen(false)}>Public Site ↗</Link><SignOutButton /></div></>;
   return <><aside className="nr-sidebar">{contents(false)}</aside><div className="nr-mobile-topbar"><div className="min-w-0"><p className="font-display font-bold">{WORKSPACE_LABELS[workspace]}</p><RoleBadge role={role} /></div><button type="button" ref={trigger} onClick={() => setOpen(true)} className="nr-icon-button" aria-label="Open workspace menu" aria-expanded={open} aria-controls="workspace-menu"><span aria-hidden="true">☰</span></button></div>
     {open && <dialog ref={dialog} id="workspace-menu" className="nr-drawer" aria-label={WORKSPACE_LABELS[workspace] + " menu"} onCancel={event => { event.preventDefault(); setOpen(false); }} onClick={event => { if (event.target === event.currentTarget) { const r = event.currentTarget.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) setOpen(false); } }}>{contents(true)}</dialog>}</>;
 }

@@ -55,16 +55,20 @@ test("Admin keeps the actual Admin badge inside both Writing and Editorial works
   const { renderToStaticMarkup } = await import("react-dom/server");
   const jsx = await import("react/jsx-runtime");
   const workspaces = await import("../lib/workspaces.ts");
+  const avatars = await import("../lib/avatar.ts");
   const load = (file) => {
     const exports = {};
     const source = ts.transpileModule(fs.readFileSync(file, "utf8"), { fileName: file, compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 } }).outputText;
-    vm.runInNewContext(source, { exports, require(name) {
+    vm.runInNewContext(source, { exports, URL, process: { env: {} }, require(name) {
       if (name === "react") return React;
       if (name === "react/jsx-runtime") return jsx;
       if (name === "next/navigation") return { usePathname: () => "/dashboard" };
       if (name === "next/link") return { default: ({ children, ...props }) => React.createElement("a", props, children) };
       if (name === "@/lib/workspaces") return workspaces;
       if (name === "./WorkspaceUI") return load("components/dashboard/WorkspaceUI.tsx");
+      if (name === "@/components/Avatar") return load("components/Avatar.tsx");
+      if (name === "@/lib/avatar") return avatars;
+      if (name === "next/image") return { default: () => null };
       if (name.includes("BrandLogo")) return { default: () => React.createElement("span", null, "The Daily Byte") };
       if (name.includes("SignOutButton")) return { default: () => React.createElement("button", null, "Sign out") };
       throw Error("Unexpected UI dependency: " + name);
