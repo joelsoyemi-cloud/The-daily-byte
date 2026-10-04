@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const SITE_NAME = "The Daily Byte";
 export const SITE_DESCRIPTION = "News, tech, and entertainment — updated daily.";
-export const SITE_URL = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://the-dailybyte-nine.vercel.app");
+export const SITE_URL = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://readthedailybyte.com");
 export const siteUrl = (path: string) => new URL(path, SITE_URL).toString();
 export const DEFAULT_SOCIAL_IMAGE = {
   url: siteUrl("/brand/the-daily-byte-og.png"), width: 1731, height: 909,
